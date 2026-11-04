@@ -27,25 +27,25 @@ export function Badge({
 }: BadgeProps) {
   const variants = {
     default:
-      "bg-[#EEF3F7] text-[#20242B] border border-[#E3E9EF]",
+      "bg-[#F0EFE9] text-[#222222] border border-[#E6E4DD]",
     primary:
-      "bg-[#DCEEFF] text-[#13457A] border border-[#9CCBFF]",
+      "bg-[#292929] text-white border border-[#292929]",
     secondary:
-      "bg-[#EEF3F7] text-[#737D8B] border border-[#E3E9EF]",
+      "bg-[#F0EFE9] text-[#737373] border border-[#E6E4DD]",
     success:
-      "bg-[#DDF4CF] text-[#225414] border border-[#C6E7B0]",
+      "bg-[#EAF5D5] text-[#255217] border border-[#D5E8B5]",
     warning:
-      "bg-[#FFF0C2] text-[#7A5300] border border-[#FBE19A]",
+      "bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]",
     error:
-      "bg-[#FCE4E4] text-[#962222] border border-[#F7C5C5]",
+      "bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]",
     yellow:
-      "bg-[#FFD95E] text-[#20242B] font-semibold border border-[#EAC248]",
+      "bg-[#FFD95E] text-[#222222] font-semibold border border-[#F2CD52]",
     dark:
-      "bg-[#242629] text-white border border-[#33383F]",
+      "bg-[#292929] text-white border border-[#3D3D3D]",
     outline:
-      "bg-transparent text-[#737D8B] border border-[#E3E9EF]",
+      "bg-transparent text-[#737373] border border-[#E6E4DD]",
     neutral:
-      "bg-white text-[#20242B] border border-[#E3E9EF] shadow-xs",
+      "bg-white text-[#222222] border border-[#E6E4DD] shadow-xs",
   };
 
   const sizes = {

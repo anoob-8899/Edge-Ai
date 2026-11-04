@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { shouldFallbackToMock } from "@/lib/demo-mode";
 
 export async function GET(
   request: NextRequest,
@@ -8,6 +9,7 @@ export async function GET(
   try {
     const { slug } = await params;
     let model: any = null;
+    let isDbSuccess = false;
     try {
       model = await prisma.sunglassModel.findUnique({
         where: { slug },
@@ -15,11 +17,22 @@ export async function GET(
           brand: true,
         },
       });
-    } catch {
+      if (model) isDbSuccess = true;
+    } catch (err) {
+      if (!shouldFallbackToMock()) {
+        console.error("Database connection failure in /api/catalogue/models/[slug]:", err);
+        return NextResponse.json(
+          { error: "Database service unavailable.", code: "DATABASE_UNAVAILABLE" },
+          { status: 503 }
+        );
+      }
       model = null;
     }
 
     if (!model) {
+      if (!shouldFallbackToMock()) {
+        return NextResponse.json({ error: "Model not found in catalogue" }, { status: 404 });
+      }
       const { FALLBACK_MODELS } = await import("@/lib/mock-data");
       model = FALLBACK_MODELS.find((m) => m.slug === slug) || FALLBACK_MODELS[0];
     }

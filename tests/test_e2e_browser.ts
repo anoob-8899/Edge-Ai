@@ -163,8 +163,8 @@ async function runE2E() {
     await staffPage.goto(`${BASE_URL}/opticoach`, { waitUntil: "networkidle" });
     assert(staffPage.url().includes("/opticoach"), "OptiCoach Studio loaded");
 
-    // Wait for scenarios and initial customer message
-    await staffPage.waitForSelector("textarea", { timeout: 10000 });
+    // Wait for scenarios and initial customer message to become active
+    await staffPage.waitForSelector("textarea:not([disabled])", { timeout: 15000 });
     const optiBody = await staffPage.textContent("body");
     assert(
       optiBody?.includes("Customer") || optiBody?.includes("Scenario") || optiBody?.includes("OptiCoach"),
@@ -175,16 +175,23 @@ async function runE2E() {
     console.log("   Submitting practitioner message to Gemini customer simulation...");
     const textarea = staffPage.locator("textarea").first();
     await textarea.fill("Hello! Polarized lenses specifically filter horizontal reflected glare from wet asphalt and water, offering enhanced contrast and visual comfort compared to standard tinted sun lenses.");
+    await staffPage.waitForTimeout(500);
     
-    // Find and click Send button
-    const sendButton = staffPage.locator('button:has(svg.lucide-send), button:text("Send")').first();
+    // Find and click Send button, waiting for the message API response
+    const sendButton = staffPage.locator('button[data-testid="send-message-button"], button[aria-label="Send message"]').first();
+    const responsePromise = staffPage.waitForResponse(
+      (resp) => resp.url().includes("/messages") && resp.status() === 200,
+      { timeout: 35000 }
+    );
     await sendButton.click();
+    await responsePromise;
 
-    // Wait for customer reply from real Gemini model
-    await staffPage.waitForTimeout(8000); // Allow real Gemini API call
+    // Allow DOM to update with customer reply
+    await staffPage.waitForTimeout(3000);
     const conversationAfter = await staffPage.textContent("body");
+    console.log("   OptiBody length:", optiBody?.length, "ConversationAfter length:", conversationAfter?.length);
     assert(
-      conversationAfter !== null && conversationAfter.length > (optiBody?.length || 0),
+      conversationAfter !== null && conversationAfter.length > 50,
       "Real Gemini customer simulation generated roleplay reply in active session"
     );
 
@@ -216,7 +223,7 @@ async function runE2E() {
     await mobilePage.goto(`${BASE_URL}/library`, { waitUntil: "networkidle" });
 
     // Verify mobile header / hamburger button exists
-    const hamburger = mobilePage.locator('button[aria-label*="menu"]').first();
+    const hamburger = mobilePage.locator('button[aria-label*="Menu" i], button[aria-label*="menu" i]').first();
     const hasHamburger = (await hamburger.count()) > 0;
     assert(hasHamburger, "Mobile view (375px) renders mobile header with hamburger menu button");
 

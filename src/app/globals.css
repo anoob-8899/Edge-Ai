@@ -1,92 +1,78 @@
 @import "tailwindcss";
 
 :root {
-  /* Strict Global Design Tokens - OptiTrain.ai */
-  --bg-pearl: #F4F7FA;
+  --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Strict Authoritative Design Tokens - OptiTrain.ai (Editorial Cream, Pearl White, Charcoal & Warm Yellow) */
+  --bg-app: #F5F4EF;
   --surface-card: #FFFFFF;
-  --surface-secondary: #EEF3F7;
-  --text-primary: #20242B;
-  --text-secondary: #737D8B;
-  --text-muted: #8E98A5;
+  --surface-secondary: #F0EFE9;
+  --surface-muted: #F1F1EF;
+  --surface-dark: #292929;
+  
+  --text-primary: #222222;
+  --text-secondary: #737373;
+  --text-muted: #9E9E9E;
+  
+  --primary-highlight: #FFD95E;
+  --primary-highlight-hover: #F2CD52;
+  --border-main: #E6E4DD;
+  --border-subtle: #EFECE6;
 
-  --accent-blue: #9CCBFF;
-  --accent-light-blue: #DCEEFF;
-  --accent-yellow: #FFD95E;
-  --dark-panel: #242629;
-  --border-main: #E3E9EF;
+  /* Status Colors */
+  --status-success-bg: #EAF5D5;
+  --status-success-text: #255217;
+  --status-warning-bg: #FEF3C7;
+  --status-warning-text: #92400E;
+  --status-error-bg: #FEE2E2;
+  --status-error-text: #991B1B;
 
-  --status-success-bg: #DDF4CF;
-  --status-success-text: #225414;
-  --status-warning-bg: #FFF0C2;
-  --status-warning-text: #7A5300;
-  --status-error-bg: #FCE4E4;
-  --status-error-text: #962222;
-
-  /* Legacy variable mappings for backward compatibility */
-  --pearl-white: #F4F7FA;
+  /* Backward Compatibility Mappings */
+  --bg-pearl: #F5F4EF;
+  --pearl-white: #F5F4EF;
   --white: #FFFFFF;
-  --ice-blue: #EEF3F7;
-  --soft-blue: #9CCBFF;
-  --primary-blue: #4285F4;
-  --deep-navy: #20242B;
+  --dark-panel: #292929;
+  --accent-yellow: #FFD95E;
+  --accent-blue: #9CCBFF;
+  --accent-light-blue: #EEF4FA;
 
-  --text-primary-legacy: #20242B;
-  --text-secondary-legacy: #737D8B;
-  --text-muted-legacy: #8E98A5;
-
-  --border-ice: #E3E9EF;
-  --border-glass: rgba(227, 233, 239, 0.85);
-  --border-highlight: rgba(255, 255, 255, 0.95);
-
-  --surface-subtle: #EEF3F7;
-  --surface-hover: #E6EEF5;
-  --focus-ring: #9CCBFF;
-
-  --status-success: #225414;
-  --status-warning: #7A5300;
-  --status-error: #962222;
-
-  /* Glassmorphism & Shadow Tokens */
-  --glass-card: rgba(255, 255, 255, 0.92);
-  --glass-card-subtle: rgba(238, 243, 247, 0.85);
-  --glass-sidebar: rgba(255, 255, 255, 0.96);
-  --glass-pill: rgba(220, 238, 255, 0.8);
-
-  --shadow-subtle: 0 1px 3px rgba(32, 36, 43, 0.04), 0 4px 12px rgba(32, 36, 43, 0.02);
-  --shadow-card: 0 4px 20px -2px rgba(32, 36, 43, 0.05), 0 2px 6px -1px rgba(32, 36, 43, 0.02);
-  --shadow-float: 0 14px 34px -4px rgba(32, 36, 43, 0.08), 0 4px 12px -2px rgba(32, 36, 43, 0.03);
-  --shadow-yellow: 0 4px 18px rgba(255, 217, 94, 0.35);
+  /* Shadows */
+  --shadow-subtle: 0 1px 3px rgba(34, 34, 34, 0.04), 0 2px 8px rgba(34, 34, 34, 0.02);
+  --shadow-card: 0 4px 20px -2px rgba(34, 34, 34, 0.04), 0 2px 6px -1px rgba(34, 34, 34, 0.02);
+  --shadow-float: 0 16px 36px -4px rgba(34, 34, 34, 0.08), 0 4px 12px -2px rgba(34, 34, 34, 0.03);
+  --shadow-yellow: 0 4px 20px rgba(255, 217, 94, 0.35);
 }
 
 @theme {
-  --color-pearl: var(--bg-pearl);
+  --color-bg-app: var(--bg-app);
   --color-card: var(--surface-card);
   --color-surface-secondary: var(--surface-secondary);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-dark: var(--surface-dark);
+  
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
-
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-light-blue: var(--accent-light-blue);
-  --color-accent-yellow: var(--accent-yellow);
-  --color-dark-panel: var(--dark-panel);
+  
+  --color-highlight: var(--primary-highlight);
   --color-border-main: var(--border-main);
-
+  
   --color-success-bg: var(--status-success-bg);
   --color-success-text: var(--status-success-text);
   --color-warning-bg: var(--status-warning-bg);
   --color-warning-text: var(--status-warning-text);
   --color-error-bg: var(--status-error-bg);
   --color-error-text: var(--status-error-text);
-
+  
   --font-heading: var(--font-primary);
   --font-body: var(--font-primary);
   --font-mono: var(--font-mono);
 }
 
 body {
-  background-color: #F4F7FA;
-  color: #20242B;
+  background-color: #F5F4EF;
+  color: #222222;
   font-family: var(--font-primary), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -95,44 +81,16 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-primary), system-ui, -apple-system, sans-serif;
   letter-spacing: -0.02em;
-  color: inherit;
+  color: #222222;
 }
 
-code, kbd, samp, pre, .font-tech {
-  font-family: var(--font-mono), monospace;
-}
-
-/* Glassmorphism Surfaces */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid #E3E9EF;
-  box-shadow: 0 4px 20px -2px rgba(32, 36, 43, 0.04);
-}
-
-.glass-panel-subtle {
-  background: rgba(238, 243, 247, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid #E3E9EF;
-  box-shadow: 0 2px 8px -2px rgba(32, 36, 43, 0.03);
-}
-
-.glass-pill {
-  background: rgba(220, 238, 255, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(156, 203, 255, 0.6);
-}
-
-/* Refined ambient glow for AI coach and cards */
-.ambient-glow-blue {
-  background: radial-gradient(circle at 50% 0%, rgba(220, 238, 255, 0.7) 0%, rgba(244, 247, 250, 0) 70%);
+/* Ambient Subtle Gradients for Special Surfaces */
+.ambient-glow-lavender {
+  background: radial-gradient(circle at 50% 0%, rgba(235, 230, 255, 0.6) 0%, rgba(245, 244, 239, 0) 70%);
 }
 
 .ambient-glow-yellow {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 217, 94, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 217, 94, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 /* Custom subtle scrollbar */
@@ -141,12 +99,12 @@ code, kbd, samp, pre, .font-tech {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F7FA;
+  background: #F5F4EF;
 }
 ::-webkit-scrollbar-thumb {
-  background: #DCE8F5;
+  background: #D8D6CE;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B8D9FF;
+  background: #C4C1B6;
 }

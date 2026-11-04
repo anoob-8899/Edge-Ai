@@ -356,13 +356,21 @@ You MUST return ONLY valid JSON conforming to the following structure (no markdo
     let parsed: any;
     try {
       parsed = JSON.parse(cleaned);
-    } catch (parseErr) {
-      console.error("JSON parse error on assessment:", cleaned);
-      throw new GeminiServiceError(
-        "Failed to parse structured assessment JSON from AI evaluator",
-        "PARSE_ERROR",
-        502
-      );
+    } catch {
+      // Attempt heuristic repairs for common LLM JSON syntax artifacts (stray bare strings, trailing commas)
+      try {
+        const repaired = cleaned
+          .replace(/"([^":\n]+)",\s*(?="[^"]+"\s*:)/g, "")
+          .replace(/,\s*([}\]])/g, "$1");
+        parsed = JSON.parse(repaired);
+      } catch (parseErr) {
+        console.error("JSON parse error on assessment:", cleaned, parseErr);
+        throw new GeminiServiceError(
+          "Failed to parse structured assessment JSON from AI evaluator",
+          "PARSE_ERROR",
+          502
+        );
+      }
     }
 
     // Normalize and sanitize criteria array

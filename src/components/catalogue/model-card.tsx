@@ -3,16 +3,13 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ExternalLink,
-  ChevronRight,
   Glasses,
-  BookOpen,
+  Plus,
+  ArrowRight,
   ShieldCheck,
-  Sparkles,
+  Award,
 } from "lucide-react";
-import { Card, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { VerificationBadge, ApprovalBadge } from "./verified-indicator";
+import { VerificationBadge } from "./verified-indicator";
 import { SunglassModelItem } from "@/lib/types";
 
 interface ModelCardProps {
@@ -23,110 +20,86 @@ export function ModelCard({ model }: ModelCardProps) {
   const [imageError, setImageError] = React.useState(false);
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden border border-[#E3E9EF] bg-white transition-all duration-200 hover:shadow-md hover:border-[#9CCBFF] rounded-[20px]">
+    <div className="group relative flex flex-col justify-between overflow-hidden border border-[#E6E4DD] bg-white transition-all duration-200 hover:shadow-md hover:border-[#FFD95E] rounded-[24px] p-4">
       <div>
-        {/* Top Badges Row */}
-        <div className="p-4 pb-2 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-bold text-[#20242B] px-2.5 py-0.5 rounded-full bg-[#EEF3F7] border border-[#E3E9EF]">
-              {model.brand.name}
-            </span>
-            <span className="text-[11px] font-mono font-semibold text-[#737D8B] px-2 py-0.5 rounded-full bg-white border border-[#E3E9EF]">
-              {model.modelCode}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            <VerificationBadge status={model.verificationStatus} size="sm" />
-          </div>
-        </div>
-
-        {/* Product Image Stage (Reference 5 Neutral Soft Container) */}
-        <div className="relative mx-4 mt-2 mb-3 h-44 rounded-[16px] bg-[#EEF3F7] border border-[#E3E9EF]/60 flex items-center justify-center p-4 overflow-hidden group-hover:scale-[1.01] transition-transform">
+        {/* Product Image Stage (Reference 5: Clean Neutral Container with Centered Product) */}
+        <div className="relative h-44 w-full rounded-2xl bg-[#F0EFE9]/60 border border-[#E6E4DD]/60 flex items-center justify-center p-4 overflow-hidden transition-transform group-hover:scale-[1.02]">
           {model.imageUrl && !imageError ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={model.imageUrl}
               alt={`${model.brand.name} ${model.officialProductName}`}
-              className="max-h-full max-w-full object-contain drop-shadow-sm"
+              className="max-h-full max-w-full object-contain drop-shadow-sm transition-transform duration-300"
               onError={() => setImageError(true)}
               loading="lazy"
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-[#737D8B] gap-1.5">
-              <div className="w-12 h-12 rounded-full bg-white shadow-xs flex items-center justify-center text-[#20242B]">
+            <div className="flex flex-col items-center justify-center text-[#737373] gap-1.5">
+              <div className="w-12 h-12 rounded-full bg-white shadow-xs flex items-center justify-center text-[#222222]">
                 <Glasses className="w-6 h-6" />
               </div>
-              <span className="text-[11px] font-medium text-[#737D8B]">Optical Silhouette</span>
+              <span className="text-[11px] font-medium text-[#737373]">Optical Silhouette</span>
             </div>
           )}
 
-          {/* Polarization Tag if verified */}
-          {model.polarizationVerified && model.isPolarized && (
+          {/* Verification Badge top right */}
+          <div className="absolute top-2.5 right-2.5">
+            <span
+              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                model.verificationStatus === "VERIFIED"
+                  ? "bg-[#EAF5D5] text-[#255217]"
+                  : "bg-[#FEF3C7] text-[#92400E]"
+              }`}
+            >
+              {model.verificationStatus === "VERIFIED" ? "● Verified" : "● In Review"}
+            </span>
+          </div>
+
+          {/* Polarized Tag bottom left */}
+          {model.isPolarized && (
             <div className="absolute bottom-2.5 left-2.5">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#242629] text-white shadow-xs">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#292929] text-white shadow-xs">
                 POLARIZED
               </span>
             </div>
           )}
-
-          {/* Category Tag */}
-          <div className="absolute top-2.5 right-2.5">
-            <span className="text-[10px] font-semibold text-[#20242B] px-2 py-0.5 rounded-full bg-white/90 border border-[#E3E9EF]">
-              {model.category}
-            </span>
-          </div>
         </div>
 
-        {/* Product Details Header */}
-        <div className="px-5 pb-3">
+        {/* Product Meta */}
+        <div className="pt-3.5 space-y-1">
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#737373]">
+            <span className="font-semibold text-[#222222]">{model.brand.name}</span>
+            <span>•</span>
+            <span>{model.modelCode}</span>
+          </div>
+
           <Link
             href={`/catalogue/${model.brand.slug}/${model.slug}`}
-            className="block group-hover:text-[#20242B] transition-colors"
+            className="block text-[#222222] hover:text-[#737373] transition-colors"
           >
-            <h3 className="font-bold text-sm md:text-base text-[#20242B] line-clamp-1">
+            <h3 className="font-bold text-sm line-clamp-1 leading-snug">
               {model.officialProductName}
             </h3>
-            {model.subName && (
-              <p className="text-xs text-[#737D8B] font-medium line-clamp-1 mt-0.5">
-                {model.subName}
-              </p>
-            )}
           </Link>
 
-          {/* Optical Specifications Grid */}
-          <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] bg-[#EEF3F7]/50 p-2.5 rounded-[12px] border border-[#E3E9EF]">
-            <div>
-              <span className="text-[#737D8B] block font-medium">Shape</span>
-              <span className="font-semibold text-[#20242B] truncate block">
-                {model.frameShape}
-              </span>
-            </div>
-            <div>
-              <span className="text-[#737D8B] block font-medium">Material</span>
-              <span className="font-semibold text-[#20242B] truncate block">
-                {model.frameMaterial}
-              </span>
-            </div>
-          </div>
+          <p className="text-xs text-[#737373] line-clamp-1">
+            {model.frameShape || "Classic"} • {model.frameMaterial || "Acetate"}
+          </p>
         </div>
       </div>
 
-      {/* Action Footer */}
-      <div className="p-4 pt-0">
+      {/* Bottom Row: Spec badge & Circular Black Action Button (Reference 5) */}
+      <div className="pt-4 mt-2 border-t border-[#E6E4DD]/60 flex items-center justify-between">
+        <span className="text-xs font-semibold text-[#222222] truncate max-w-[140px]">
+          {model.lensTechnology || "UV400 Protected"}
+        </span>
+
         <Link
           href={`/catalogue/${model.brand.slug}/${model.slug}`}
-          className="block"
+          title="Inspect Technical Specs"
+          className="w-8 h-8 rounded-full bg-[#292929] hover:bg-[#3d3d3d] text-white flex items-center justify-center transition-transform hover:scale-105 shrink-0 shadow-xs"
         >
-          <Button
-            variant="outline"
-            size="sm"
-            pill
-            className="w-full text-xs font-semibold justify-between group-hover:bg-[#242629] group-hover:text-white group-hover:border-[#242629] transition-colors"
-          >
-            <span>Learn Dispensing Specs</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Button>
+          <Plus className="h-4 w-4" />
         </Link>
       </div>
     </div>

@@ -10,25 +10,25 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", hoverable = false, ...props }, ref) => {
     const variants = {
       default:
-        "bg-white border border-[#E3E9EF] shadow-[0_4px_20px_-2px_rgba(32,36,43,0.03)]",
+        "bg-white border border-[#E6E4DD] shadow-[0_4px_24px_-4px_rgba(34,34,34,0.04)]",
       glass:
-        "bg-white/90 backdrop-blur-md border border-[#E3E9EF] shadow-[0_4px_20px_-2px_rgba(32,36,43,0.04)]",
+        "bg-white/95 backdrop-blur-md border border-[#E6E4DD] shadow-[0_4px_24px_-4px_rgba(34,34,34,0.04)]",
       subtle:
-        "bg-[#EEF3F7] border border-[#E3E9EF]/90 shadow-none",
+        "bg-[#F0EFE9] border border-[#E6E4DD] shadow-none",
       dark:
-        "bg-[#242629] text-white border border-[#33383F] shadow-[0_8px_30px_rgba(0,0,0,0.12)]",
+        "bg-[#292929] text-white border border-[#3D3D3D] shadow-[0_8px_32px_rgba(0,0,0,0.16)]",
       outline:
-        "bg-transparent border border-[#E3E9EF] shadow-none",
+        "bg-transparent border border-[#E6E4DD] shadow-none",
     };
 
     return (
       <div
         ref={ref}
         className={cn(
-          "rounded-[20px] transition-all duration-200",
+          "rounded-[24px] transition-all duration-200",
           variants[variant],
           hoverable &&
-            "hover:border-[#9CCBFF] hover:shadow-[0_8px_26px_-4px_rgba(32,36,43,0.08)] hover:-translate-y-0.5",
+            "hover:border-[#FFD95E] hover:shadow-[0_10px_30px_-4px_rgba(34,34,34,0.07)] hover:-translate-y-0.5",
           className
         )}
         {...props}
@@ -57,7 +57,7 @@ export const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-base md:text-lg font-semibold text-[#20242B] tracking-tight leading-tight",
+      "text-base md:text-lg font-semibold text-[#222222] tracking-tight leading-tight",
       className
     )}
     {...props}
@@ -71,7 +71,7 @@ export const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-xs md:text-sm text-[#737D8B] leading-relaxed", className)}
+    className={cn("text-xs md:text-sm text-[#737373] leading-relaxed", className)}
     {...props}
   />
 ));

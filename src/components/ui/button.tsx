@@ -32,25 +32,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9CCBFF] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none";
+      "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD95E] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none";
 
     const variantStyles = {
       primary:
-        "bg-[#20242B] text-white hover:bg-[#33383F] active:bg-[#15171B] shadow-xs",
+        "bg-[#292929] text-white hover:bg-[#3d3d3d] active:bg-[#1a1a1a] shadow-xs",
       secondary:
-        "bg-[#EEF3F7] text-[#20242B] hover:bg-[#E2EAF1] active:bg-[#D5E1EC] border border-[#E3E9EF]",
+        "bg-[#F0EFE9] text-[#222222] hover:bg-[#E6E4DD] active:bg-[#DCD9D0] border border-[#E6E4DD]",
       outline:
-        "bg-white hover:bg-[#EEF3F7] text-[#20242B] border border-[#E3E9EF] shadow-xs",
+        "bg-white hover:bg-[#F0EFE9] text-[#222222] border border-[#E6E4DD] shadow-xs",
       ghost:
-        "text-[#20242B] hover:bg-[#EEF3F7] active:bg-[#E2EAF1]",
+        "text-[#222222] hover:bg-[#F0EFE9] active:bg-[#E6E4DD]",
       danger:
-        "bg-[#FCE4E4] text-[#962222] border border-[#F5C2C2] hover:bg-[#F9D0D0]",
+        "bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] hover:bg-[#FCA5A5]/30",
       yellow:
-        "bg-[#FFD95E] text-[#20242B] font-semibold hover:bg-[#F2CD52] active:bg-[#E8C244] shadow-sm",
+        "bg-[#FFD95E] text-[#222222] font-semibold hover:bg-[#F2CD52] active:bg-[#E5BE45] shadow-xs",
       dark:
-        "bg-[#242629] text-white hover:bg-[#1a1c1e] active:bg-[#121315] shadow-sm",
+        "bg-[#292929] text-white hover:bg-[#3d3d3d] active:bg-[#1a1a1a] shadow-xs",
       glass:
-        "bg-white/80 backdrop-blur-md text-[#20242B] border border-[#E3E9EF] hover:bg-white shadow-xs",
+        "bg-white/80 backdrop-blur-md text-[#222222] border border-[#E6E4DD] hover:bg-white shadow-xs",
     };
 
     const sizeStyles = {

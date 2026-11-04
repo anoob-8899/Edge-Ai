@@ -111,7 +111,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F7FA] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F5F4EF] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       {/* Subtle Ambient Background Glow */}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#DCEEFF]/40 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#FFD95E]/20 blur-3xl pointer-events-none" />
@@ -122,7 +122,7 @@ export default function SignInPage() {
         <div className="mb-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#737D8B] hover:text-[#20242B] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#737373] hover:text-[#222222] transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
             <span>Return to OptiTrain.ai Home</span>
@@ -131,20 +131,20 @@ export default function SignInPage() {
 
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-[16px] bg-[#242629] text-white shadow-xs mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-[16px] bg-[#292929] text-white shadow-xs mb-3">
             <Glasses className="h-6 w-6 text-[#FFD95E]" />
           </div>
-          <h1 className="text-2xl font-bold text-[#20242B] tracking-tight">
+          <h1 className="text-2xl font-bold text-[#222222] tracking-tight">
             OptiTrain<span className="text-[#9CCBFF]">.ai</span>
           </h1>
-          <p className="text-xs sm:text-sm text-[#737D8B] mt-1 font-normal">
+          <p className="text-xs sm:text-sm text-[#737373] mt-1 font-normal">
             AI Optical Staff Training & Performance Platform
           </p>
         </div>
 
         {/* Already Logged In Banner */}
         {user && (
-          <div className="mb-4 p-3.5 rounded-[16px] bg-white border border-[#E3E9EF] text-xs text-[#20242B] flex items-center justify-between shadow-xs">
+          <div className="mb-4 p-3.5 rounded-[16px] bg-white border border-[#E6E4DD] text-xs text-[#222222] flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2">
               <UserCheck className="h-4 w-4 text-[#225414]" />
               <span>
@@ -153,7 +153,7 @@ export default function SignInPage() {
             </div>
             <Link
               href={user.role === "OWNER" ? "/owner" : "/staff"}
-              className="font-bold text-[#20242B] hover:underline"
+              className="font-bold text-[#222222] hover:underline"
             >
               Go to Dashboard &rarr;
             </Link>
@@ -172,15 +172,15 @@ export default function SignInPage() {
         )}
 
         {/* Sign In Card */}
-        <div className="bg-white border border-[#E3E9EF] rounded-[20px] p-6 shadow-xs space-y-5">
+        <div className="bg-white border border-[#E6E4DD] rounded-[28px] p-6 shadow-xs space-y-5">
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#20242B]">Staff & Practice Access</h2>
+              <h2 className="text-lg font-bold text-[#222222]">Staff & Practice Access</h2>
               <Badge variant="secondary" size="sm" isMono>
                 SECURE AUTH
               </Badge>
             </div>
-            <p className="text-xs text-[#737D8B]">
+            <p className="text-xs text-[#737373]">
               Enter your optical practice credentials to sign in
             </p>
           </div>
@@ -189,7 +189,7 @@ export default function SignInPage() {
             {/* Interactive Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#20242B] mb-1">
+                <label className="block text-xs font-semibold text-[#222222] mb-1">
                   Practice Domain / Clinic ID (Optional)
                 </label>
                 <Input
@@ -201,28 +201,28 @@ export default function SignInPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#20242B] mb-1">
+                <label className="block text-xs font-semibold text-[#222222] mb-1">
                   Staff Email or Username
                 </label>
                 <Input
-                  type="text"
+                  type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="abhi, staff@apexoptics.com, or owner@apexoptics.com"
+                  placeholder="staff@apex-optics.com or owner@apex-optics.com"
                   icon={<Mail className="h-4 w-4" />}
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-[#20242B]">
+                  <label className="text-xs font-semibold text-[#222222]">
                     Password
                   </label>
                   <button
                     type="button"
                     onClick={() => setIsBootstrapOpen(true)}
-                    className="text-[11px] text-[#20242B] hover:underline font-medium"
+                    className="text-[11px] text-[#222222] hover:underline font-medium"
                   >
                     Initialize Owner Account?
                   </button>
@@ -252,45 +252,50 @@ export default function SignInPage() {
                 </Button>
               </div>
 
-              {/* Instant One-Click Demo Access */}
-              <div className="pt-4 border-t border-[#E3E9EF]">
-                <p className="text-[11px] font-semibold text-[#737D8B] text-center mb-2 uppercase tracking-wider">
-                  Instant Test & Demo Accounts
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("staff")}
-                    disabled={isLoading}
-                    className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#EEF3F7] hover:bg-[#DCEEFF] text-left transition-colors border border-[#E3E9EF]"
-                  >
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-[#20242B] truncate">Alex Chen (Abhi)</div>
-                      <div className="text-[10px] text-[#737D8B]">Staff Dispenser</div>
-                    </div>
-                    <UserCheck className="h-4 w-4 text-[#20242B] shrink-0 ml-1" />
-                  </button>
+              {/* Instant One-Click Demo Access (Enabled only in Sandbox/Demo Environments) */}
+              {(process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true" || process.env.NODE_ENV !== "production") && (
+                <div className="pt-4 border-t border-[#E6E4DD]">
+                  <div className="flex items-center justify-center gap-1.5 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-[#16865C] animate-pulse" />
+                    <p className="text-[11px] font-semibold text-[#737373] text-center uppercase tracking-wider">
+                      Demo Sandbox Access
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleQuickLogin("staff")}
+                      disabled={isLoading}
+                      className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#F0EFE9] hover:bg-[#DCEEFF] text-left transition-colors border border-[#E6E4DD]"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-[#222222] truncate">Alex Chen (Abhi)</div>
+                        <div className="text-[10px] text-[#737373]">Staff Dispenser (Demo)</div>
+                      </div>
+                      <UserCheck className="h-4 w-4 text-[#222222] shrink-0 ml-1" />
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("owner")}
-                    disabled={isLoading}
-                    className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#242629] hover:bg-[#33383F] text-left transition-colors shadow-xs"
-                  >
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-white truncate">Dr. Marcus Vance</div>
-                      <div className="text-[10px] text-[#FFD95E]">Practice Owner</div>
-                    </div>
-                    <ShieldCheck className="h-4 w-4 text-[#FFD95E] shrink-0 ml-1" />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickLogin("owner")}
+                      disabled={isLoading}
+                      className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#292929] hover:bg-[#33383F] text-left transition-colors shadow-xs"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-white truncate">Dr. Marcus Vance</div>
+                        <div className="text-[10px] text-[#FFD95E]">Practice Owner (Demo)</div>
+                      </div>
+                      <ShieldCheck className="h-4 w-4 text-[#FFD95E] shrink-0 ml-1" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </form>
           </div>
         </div>
 
         {/* Security / Compliance Notice Footer */}
-        <div className="mt-6 text-center text-xs text-[#737D8B] space-y-1">
+        <div className="mt-6 text-center text-xs text-[#737373] space-y-1">
           <p>OptiTrain.ai • Optical Retail Staff Training Platform</p>
           <p>Role-based access control with secure cryptographic session tokens.</p>
         </div>
@@ -376,3 +381,4 @@ export default function SignInPage() {
     </div>
   );
 }
+

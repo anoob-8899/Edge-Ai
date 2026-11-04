@@ -10,13 +10,12 @@ import {
   ChevronRight,
   RotateCcw,
   Building2,
-  Globe2,
-  ArrowRight,
   SlidersHorizontal,
+  ChevronDown,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { FilterPill } from "@/components/shared/filter-pill";
 import { ModelCard } from "@/components/catalogue/model-card";
 import { BrandItem, SunglassModelItem } from "@/lib/types";
@@ -35,8 +34,8 @@ export default function BrandedSunglassesCataloguePage() {
   const [selectedMaterial, setSelectedMaterial] = React.useState("");
   const [selectedPolarized, setSelectedPolarized] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState("");
+  const [isDemoData, setIsDemoData] = React.useState(false);
 
-  // Fetch brands
   const fetchBrands = React.useCallback(async () => {
     try {
       const res = await fetch("/api/catalogue/brands");
@@ -49,7 +48,6 @@ export default function BrandedSunglassesCataloguePage() {
     }
   }, []);
 
-  // Fetch models with filters
   const fetchModels = React.useCallback(async () => {
     setLoading(true);
     try {
@@ -65,6 +63,9 @@ export default function BrandedSunglassesCataloguePage() {
       const data = await res.json();
       if (data.models) {
         setModels(data.models);
+      }
+      if (data.isDemoData !== undefined) {
+        setIsDemoData(Boolean(data.isDemoData));
       }
     } catch (e) {
       console.error("Error loading models:", e);
@@ -110,183 +111,161 @@ export default function BrandedSunglassesCataloguePage() {
     selectedStatus
   );
 
-  // Summary statistics
-  const totalVerifiedModels = models.filter((m) => m.verificationStatus === "VERIFIED").length;
-  const totalIncompleteModels = models.filter((m) => m.verificationStatus === "PARTIALLY_VERIFIED").length;
-
   const categories = [
-    { id: "all", label: "All Products" },
+    { id: "all", label: "All Eyewear" },
     { id: "sunglasses", label: "Sunglasses" },
     { id: "optical", label: "Optical Frames" },
-    { id: "lenses", label: "Prescription Lenses" },
-    { id: "coatings", label: "Lens Coatings" },
-    { id: "materials", label: "Frame Materials" },
+    { id: "polarized", label: "Polarized Lenses" },
+    { id: "titanium", label: "Titanium Tech" },
+    { id: "acetate", label: "Handcrafted Acetate" },
   ];
+
+  // Distinct values for sidebar filters
+  const shapes = ["Aviator", "Square", "Round", "Wayfarer", "Rectangle", "Pilot", "Geometric"];
+  const materials = ["Acetate", "Metal", "Titanium", "Propionate", "O Matter"];
 
   return (
     <AppShell
-      title="Product Knowledge Catalogue"
-      subtitle="Branded eyewear specifications, optical geometries & lens dispensing technology"
+      title="Optical Product Knowledge Catalogue"
+      subtitle="Branded eyewear specifications, verified geometries & lens dispensing technology"
     >
-      <div className="space-y-6 pb-16">
-        {/* Top Header Card (Unified Ice Glass + Pearl White) */}
-        <div className="bg-white border border-[#E3E9EF] rounded-[20px] p-6 md:p-8 shadow-xs space-y-4">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FFD95E] text-[#20242B]">
-              <Sun className="w-3.5 h-3.5" />
-              Optical Learning Catalogue
-            </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#DDF4CF] text-[#225414]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Manufacturer Verified
-            </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono bg-[#EEF3F7] text-[#737D8B] border border-[#E3E9EF]">
-              Strict Zero-Price Curriculum Policy
-            </span>
-          </div>
-
-          <div className="max-w-3xl">
-            <h1 className="font-bold text-2xl md:text-3xl text-[#20242B] tracking-tight">
-              Optical Product Knowledge & Dispensing Dossier
-            </h1>
-            <p className="text-xs md:text-sm text-[#737D8B] mt-1.5 leading-relaxed">
-              Investigate official brand archetypes, verified frame geometries, lens technologies,
-              and clinical dispensing notes across luxury and performance eyewear brands.
-            </p>
-          </div>
-
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3.5 rounded-[16px] bg-[#EEF3F7]/60 border border-[#E3E9EF]">
-              <div className="text-[11px] text-[#737D8B] font-medium uppercase tracking-wider">Starting Brands</div>
-              <div className="text-xl font-bold text-[#20242B] mt-0.5">{brands.length || 12} Brands</div>
-            </div>
-            <div className="p-3.5 rounded-[16px] bg-[#EEF3F7]/60 border border-[#E3E9EF]">
-              <div className="text-[11px] text-[#737D8B] font-medium uppercase tracking-wider">Catalogued Models</div>
-              <div className="text-xl font-bold text-[#20242B] mt-0.5">{models.length} Records</div>
-            </div>
-            <div className="p-3.5 rounded-[16px] bg-[#DDF4CF]/40 border border-[#C6E7B0]">
-              <div className="text-[11px] text-[#225414] font-medium uppercase tracking-wider">Verified Specs</div>
-              <div className="text-xl font-bold text-[#225414] mt-0.5">{totalVerifiedModels} Certified</div>
-            </div>
-            <div className="p-3.5 rounded-[16px] bg-[#FFF0C2]/40 border border-[#FBE19A]">
-              <div className="text-[11px] text-[#7A5300] font-medium uppercase tracking-wider">Incomplete Specs</div>
-              <div className="text-xl font-bold text-[#7A5300] mt-0.5">{totalIncompleteModels} Missing Notes</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Top Category Pill Filter Bar (Reference 5 Hollis Style) */}
-        <div className="flex items-center justify-between border-b border-[#E3E9EF] pb-3 gap-4 flex-wrap">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+      <div className="space-y-6">
+        {/* Top Category Pill Navigation (Reference 5 Hollis Style: Floating Tabs) */}
+        <div className="flex items-center justify-between gap-4 flex-wrap pb-2 border-b border-[#E6E4DD]/60">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
             {categories.map((cat) => (
               <FilterPill
                 key={cat.id}
                 label={cat.label}
                 active={activeCategory === cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => {
+                  setActiveCategory(cat.id);
+                  if (cat.id === "polarized") setSelectedPolarized("true");
+                  else if (cat.id === "titanium") setSelectedMaterial("Titanium");
+                  else if (cat.id === "acetate") setSelectedMaterial("Acetate");
+                  else {
+                    setSelectedPolarized("");
+                    setSelectedMaterial("");
+                  }
+                }}
               />
             ))}
           </div>
 
-          {/* View Mode Toggle: Models vs Brands */}
-          <div className="flex items-center gap-1 p-1 bg-[#EEF3F7] rounded-full border border-[#E3E9EF]">
+          {/* Mode Switch: Models vs Brands */}
+          <div className="flex items-center bg-white border border-[#E6E4DD] rounded-full p-1 shadow-xs">
             <button
               onClick={() => setActiveTab("models")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                activeTab === "models"
-                  ? "bg-[#242629] text-white shadow-xs"
-                  : "text-[#737D8B] hover:text-[#20242B]"
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                activeTab === "models" ? "bg-[#292929] text-white" : "text-[#737373] hover:text-[#222222]"
               }`}
             >
-              <Glasses className="w-3.5 h-3.5" />
-              <span>Models ({models.length})</span>
+              Models ({models.length})
             </button>
-
             <button
               onClick={() => setActiveTab("brands")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                activeTab === "brands"
-                  ? "bg-[#242629] text-white shadow-xs"
-                  : "text-[#737D8B] hover:text-[#20242B]"
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                activeTab === "brands" ? "bg-[#292929] text-white" : "text-[#737373] hover:text-[#222222]"
               }`}
             >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Brands ({brands.length})</span>
+              Brands ({brands.length})
             </button>
           </div>
         </div>
 
-        {/* TAB 1: BRANDS INDEX VIEW */}
-        {activeTab === "brands" && (
-          <div className="space-y-4">
-            <div>
-              <h2 className="font-bold text-lg text-[#20242B]">
-                The Premier Optical Brand Archetypes
-              </h2>
-              <p className="text-xs text-[#737D8B]">
-                Manufacturer portfolios from EssilorLuxottica, Kering Eyewear, Safilo, De Rigo, and Marchon.
-              </p>
+        {/* HERO SECTION (Reference 5 Composition: Breadcrumbs + Large Editorial Title + Featured Product Showcase Banner) */}
+        <div className="bg-white rounded-[32px] border border-[#E6E4DD] p-6 md:p-8 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative overflow-hidden">
+          <div className="space-y-3 max-w-xl relative z-10">
+            <div className="text-xs font-medium text-[#737373] flex items-center gap-1.5">
+              <span>Catalogue</span>
+              <ChevronRight className="h-3 w-3 text-[#737373]" />
+              <span className="text-[#222222] font-semibold">Branded Optical & Sunglasses</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-[#222222]">
+              Eyewear Library
+            </h1>
+
+            <p className="text-xs sm:text-sm text-[#737373] leading-relaxed">
+              Explore authentic luxury frame archetypes, certified hinge engineering, lens polarization coatings,
+              and clinical dispensing guidelines across premier global eyewear brands.
+            </p>
+
+            <div className="pt-2 flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#EAF5D5] text-[#255217]">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Verified Technical Specs
+              </span>
+              <span className="text-xs text-[#737373]">
+                Strict Zero-Price Educational Standards
+              </span>
+            </div>
+          </div>
+
+          {/* Right Featured Showcase Card (Faithful to Reference 5 Hollis Hero Card) */}
+          <div className="relative z-10 lg:w-[420px] bg-[#F0EFE9]/70 border border-[#E6E4DD] rounded-[24px] p-5 shadow-xs flex items-center gap-4 group">
+            <div className="w-24 h-24 rounded-2xl bg-white border border-[#E6E4DD] flex items-center justify-center p-2 shrink-0 overflow-hidden shadow-2xs">
+              <Glasses className="w-12 h-12 text-[#222222] group-hover:scale-110 transition-transform" />
+            </div>
+
+            <div className="space-y-1 min-w-0 flex-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#FFD95E] text-[#222222]">
+                Featured Archetype
+              </span>
+              <h3 className="font-bold text-sm text-[#222222] truncate">
+                Ray-Ban Aviator Classic
+              </h3>
+              <p className="text-xs text-[#737373] truncate">
+                Polarized G-15 • Monel Metal
+              </p>
+              <div className="pt-1">
+                <Link
+                  href="/catalogue/ray-ban/rb3025-aviator"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#222222] hover:underline"
+                >
+                  <span>Inspect Spec Dossier</span>
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* BRANDS TAB VIEW */}
+        {activeTab === "brands" && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {brands.map((b) => (
                 <div
                   key={b.slug}
-                  className="overflow-hidden border border-[#E3E9EF] bg-white hover:border-[#9CCBFF] hover:shadow-xs transition-all rounded-[20px] p-5 flex flex-col justify-between"
+                  className="border border-[#E6E4DD] bg-white hover:border-[#FFD95E] hover:shadow-sm transition-all rounded-[24px] p-5 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-base text-[#20242B]">
-                            {b.name}
-                          </span>
-                          <span className="font-mono text-[10px] text-[#20242B] bg-[#EEF3F7] px-2 py-0.5 rounded-full border border-[#E3E9EF]">
-                            #{b.orderIndex}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-[#737D8B] mt-1">
-                          <Globe2 className="w-3.5 h-3.5" />
-                          <span>{b.countryOfOrigin || "International"}</span>
-                          <span>•</span>
-                          <span className="truncate">{b.parentCompany || "Independent"}</span>
-                        </div>
-                      </div>
-
-                      <div className="text-right">
-                        <span className="text-xs font-bold text-[#20242B] block">
-                          {b.modelCount || 0} Models
-                        </span>
-                        <span className="text-[10px] font-semibold text-[#225414] block">
-                          {b.verifiedCount || 0} Certified
-                        </span>
-                      </div>
+                    <div className="flex items-start justify-between">
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#F0EFE9] text-[#222222]">
+                        {b.parentCompany || "EssilorLuxottica"}
+                      </span>
+                      <span className="text-xs font-mono text-[#737373]">
+                        {b.modelCount || 0} Models
+                      </span>
                     </div>
 
-                    <p className="text-xs text-[#737D8B] leading-relaxed line-clamp-3">
-                      {b.heritage}
-                    </p>
+                    <div>
+                      <h3 className="font-bold text-base text-[#222222]">{b.name}</h3>
+                      <p className="text-xs text-[#737373] mt-1 line-clamp-2 leading-relaxed">
+                        {b.heritage || "Premier optical heritage and precision frame styling."}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-[#E3E9EF] flex items-center justify-between">
-                    <button
-                      onClick={() => {
-                        setSelectedBrand(b.slug);
-                        setActiveTab("models");
-                      }}
-                      className="text-xs font-semibold text-[#20242B] hover:text-black flex items-center gap-1"
-                    >
-                      <span>Filter Models</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-
+                  <div className="pt-4 mt-4 border-t border-[#E6E4DD]/60 flex items-center justify-between text-xs">
+                    <span className="text-[#737373] font-medium">{b.countryOfOrigin || "Italy"}</span>
                     <Link
                       href={`/catalogue/brands/${b.slug}`}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#242629] text-white hover:bg-black transition-all"
+                      className="font-bold text-[#222222] hover:text-[#737373] flex items-center gap-1"
                     >
-                      <span>Brand Dossier</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <span>Explore</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
@@ -295,218 +274,205 @@ export default function BrandedSunglassesCataloguePage() {
           </div>
         )}
 
-        {/* TAB 2: PRODUCT MODELS WITH REFERENCE 5 (HOLLIS) SIDEBAR FILTER LAYOUT */}
+        {/* MODELS TAB VIEW: 2-COLUMN CATALOGUE WORKSPACE (Reference 5 Layout) */}
         {activeTab === "models" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="space-y-4">
+            {isDemoData && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#FFF8E1] border border-[#FFE082] text-xs text-[#7A5300]">
+                <span className="w-2 h-2 rounded-full bg-[#EAB308] shrink-0" />
+                <span className="font-semibold">Demonstration Optical Catalogue:</span>
+                <span>Showing 22 certified reference frames with optical dimensions and lens notes. Zero retail pricing displayed.</span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* ========================================================================= */}
-            {/* LEFT FILTER SIDEBAR (Reference 5 Hollis Style - 3.5 Columns) */}
+            {/* LEFT FILTER SIDEBAR (Reference 5) */}
             {/* ========================================================================= */}
-            <div className="lg:col-span-4 bg-white border border-[#E3E9EF] rounded-[20px] p-5 space-y-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E3E9EF]">
+            <aside className="lg:col-span-3 bg-white border border-[#E6E4DD] rounded-[28px] p-6 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#E6E4DD]/60 pb-3">
                 <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-[#20242B]" />
-                  <h3 className="font-bold text-sm text-[#20242B]">Filter Catalogue</h3>
+                  <SlidersHorizontal className="h-4 w-4 text-[#222222]" />
+                  <h3 className="font-bold text-sm text-[#222222]">Filters</h3>
                 </div>
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs text-[#962222] font-semibold hover:underline flex items-center gap-1"
+                    className="text-xs text-[#991B1B] hover:underline font-semibold"
                   >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Reset</span>
+                    Reset
                   </button>
                 )}
               </div>
 
-              {/* Format / Frame Shape Pills */}
+              {/* Search Bar */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#737373] uppercase tracking-wider block">
+                  Search Eyewear
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#737373]" />
+                  <input
+                    type="text"
+                    placeholder="Search model, code, specs..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-9 pl-8 pr-3 text-xs rounded-full bg-[#F0EFE9] text-[#222222] placeholder-[#737373] border-none focus:outline-none focus:ring-1 focus:ring-[#292929]"
+                  />
+                </div>
+              </div>
+
+              {/* Brand Filter */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-[#737D8B] uppercase tracking-wider block">
-                  Frame Geometry
+                <label className="text-xs font-bold text-[#737373] uppercase tracking-wider block">
+                  Brand Archetype
+                </label>
+                <div className="relative">
+                  <select
+                    value={selectedBrand}
+                    onChange={(e) => setSelectedBrand(e.target.value)}
+                    className="w-full appearance-none pl-3.5 pr-8 py-2 bg-[#F0EFE9] text-xs font-medium text-[#222222] rounded-full border border-transparent focus:outline-none focus:border-[#292929] cursor-pointer"
+                  >
+                    <option value="">All Brands</option>
+                    {brands.map((b) => (
+                      <option key={b.slug} value={b.slug}>{b.name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#737373] pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Frame Shape Filters (Reference 5 Rounded Filter Tags with Counts) */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#737373] uppercase tracking-wider block">
+                  Frame Shape
                 </label>
                 <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { id: "", label: "All Shapes" },
-                    { id: "Aviator", label: "Aviator / Pilot" },
-                    { id: "Rectangle", label: "Square / Rectangular" },
-                    { id: "Round", label: "Round / Pantos" },
-                    { id: "Cat Eye", label: "Cat Eye" },
-                    { id: "Browline", label: "Browline" },
-                    { id: "Shield", label: "Shield / Wrap" },
-                  ].map((s) => (
-                    <FilterPill
-                      key={s.id}
-                      label={s.label}
-                      active={selectedShape === s.id}
-                      onClick={() => setSelectedShape(s.id)}
-                    />
+                  {shapes.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSelectedShape(selectedShape === s ? "" : s)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                        selectedShape === s
+                          ? "bg-[#292929] text-white"
+                          : "bg-[#F0EFE9] text-[#222222] hover:bg-[#E6E4DD]"
+                      }`}
+                    >
+                      {s}
+                    </button>
                   ))}
                 </div>
               </div>
 
-              {/* Brand Pills */}
+              {/* Frame Material Filters */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-[#737D8B] uppercase tracking-wider block">
-                  Brand Collection
-                </label>
-                <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1">
-                  <FilterPill
-                    label="All Brands"
-                    active={selectedBrand === ""}
-                    onClick={() => setSelectedBrand("")}
-                  />
-                  {brands.map((b) => (
-                    <FilterPill
-                      key={b.slug}
-                      label={b.name}
-                      active={selectedBrand === b.slug}
-                      onClick={() => setSelectedBrand(b.slug)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Frame Material Pills */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-[#737D8B] uppercase tracking-wider block">
+                <label className="text-xs font-bold text-[#737373] uppercase tracking-wider block">
                   Frame Material
                 </label>
                 <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { id: "", label: "All Materials" },
-                    { id: "Metal", label: "Metal / Alloy" },
-                    { id: "Acetate", label: "Acetate" },
-                    { id: "Propionate", label: "Propionate" },
-                    { id: "Matter", label: "O Matter™" },
-                  ].map((m) => (
-                    <FilterPill
-                      key={m.id}
-                      label={m.label}
-                      active={selectedMaterial === m.id}
-                      onClick={() => setSelectedMaterial(m.id)}
-                    />
+                  {materials.map((m) => (
+                    <button
+                      key={m}
+                      onClick={() => setSelectedMaterial(selectedMaterial === m ? "" : m)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                        selectedMaterial === m
+                          ? "bg-[#292929] text-white"
+                          : "bg-[#F0EFE9] text-[#222222] hover:bg-[#E6E4DD]"
+                      }`}
+                    >
+                      {m}
+                    </button>
                   ))}
                 </div>
               </div>
 
               {/* Polarization Filter */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-[#737D8B] uppercase tracking-wider block">
-                  Optical Polarization
+                <label className="text-xs font-bold text-[#737373] uppercase tracking-wider block">
+                  Lens Polarization
                 </label>
-                <div className="flex flex-wrap gap-1.5">
-                  <FilterPill
-                    label="All Optics"
-                    active={selectedPolarized === ""}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSelectedPolarized(selectedPolarized === "true" ? "" : "true")}
+                    className={`flex-1 py-1.5 rounded-full text-xs font-semibold text-center transition-all ${
+                      selectedPolarized === "true"
+                        ? "bg-[#292929] text-white"
+                        : "bg-[#F0EFE9] text-[#222222] hover:bg-[#E6E4DD]"
+                    }`}
+                  >
+                    Polarized Only
+                  </button>
+                  <button
                     onClick={() => setSelectedPolarized("")}
-                  />
-                  <FilterPill
-                    label="Polarized Only"
-                    active={selectedPolarized === "true"}
-                    onClick={() => setSelectedPolarized("true")}
-                  />
-                  <FilterPill
-                    label="Non-Polarized"
-                    active={selectedPolarized === "false"}
-                    onClick={() => setSelectedPolarized("false")}
-                  />
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold text-center transition-all ${
+                      !selectedPolarized
+                        ? "bg-[#292929] text-white"
+                        : "bg-[#F0EFE9] text-[#222222]"
+                    }`}
+                  >
+                    All
+                  </button>
                 </div>
               </div>
-
-              {/* Specification Verification */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-[#737D8B] uppercase tracking-wider block">
-                  Verification State
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                  <FilterPill
-                    label="All Statuses"
-                    active={selectedStatus === ""}
-                    onClick={() => setSelectedStatus("")}
-                  />
-                  <FilterPill
-                    label="Fully Certified"
-                    active={selectedStatus === "VERIFIED"}
-                    onClick={() => setSelectedStatus("VERIFIED")}
-                  />
-                  <FilterPill
-                    label="Missing Notes"
-                    active={selectedStatus === "PARTIALLY_VERIFIED"}
-                    onClick={() => setSelectedStatus("PARTIALLY_VERIFIED")}
-                  />
-                </div>
-              </div>
-            </div>
+            </aside>
 
             {/* ========================================================================= */}
-            {/* RIGHT MAIN CONTENT AREA: SEARCH & PRODUCT GRID (8.5 Columns) */}
+            {/* RIGHT PRODUCT GRID (Reference 5 4-Column Grid) */}
             {/* ========================================================================= */}
-            <div className="lg:col-span-8 space-y-4">
-              {/* Search Bar matching Reference 5 */}
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#737D8B]" />
-                <input
-                  type="text"
-                  placeholder="Search model code (e.g. RB3025, GG1578S, OO9100), shape, material, lens tech..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-11 pl-11 pr-4 text-xs md:text-sm rounded-full bg-white text-[#20242B] placeholder-[#737D8B] border border-[#E3E9EF] focus:border-[#9CCBFF] focus:outline-none shadow-xs transition-colors"
-                />
-              </div>
+            <section className="lg:col-span-9 space-y-4">
+              {/* Grid Top Meta Row (Reference 5: "24 products" + Sort by Featured v) */}
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-bold text-[#737373] uppercase tracking-wider">
+                  {models.length} {models.length === 1 ? "Product" : "Products"} Catalogued
+                </span>
 
-              {/* Result Summary Bar */}
-              <div className="flex items-center justify-between text-xs text-[#737D8B] px-1">
-                <div>
-                  Showing <strong className="text-[#20242B]">{models.length}</strong> optical models
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1 font-semibold text-[#225414]">
-                    <span className="w-2 h-2 rounded-full bg-[#8CE071]" />
-                    {totalVerifiedModels} Certified
-                  </span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-[#7A5300]">
-                    <span className="w-2 h-2 rounded-full bg-[#FFD95E]" />
-                    {totalIncompleteModels} Incomplete
-                  </span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E6E4DD] text-xs font-semibold text-[#222222] shadow-xs">
+                  <span>Sort by: Featured</span>
+                  <ChevronDown className="h-3 w-3 text-[#737373]" />
                 </div>
               </div>
 
-              {/* Product Grid */}
+              {/* 4-Column Product Grid */}
               {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {[...Array(6)].map((_, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                  {Array.from({ length: 8 }).map((_, i) => (
                     <div
                       key={i}
-                      className="h-80 rounded-[20px] bg-white border border-[#E3E9EF] animate-pulse p-5 space-y-4 shadow-xs"
+                      className="bg-white rounded-[24px] border border-[#E6E4DD] p-4 h-72 animate-pulse space-y-3"
                     >
-                      <div className="h-4 bg-[#EEF3F7] rounded w-1/3" />
-                      <div className="h-36 bg-[#EEF3F7] rounded-[16px]" />
-                      <div className="h-4 bg-[#EEF3F7] rounded w-3/4" />
-                      <div className="h-10 bg-[#EEF3F7] rounded-full" />
+                      <div className="h-44 bg-[#F0EFE9] rounded-2xl w-full" />
+                      <div className="h-4 bg-[#F0EFE9] rounded w-3/4" />
+                      <div className="h-3 bg-[#F0EFE9] rounded w-1/2" />
                     </div>
                   ))}
                 </div>
               ) : models.length === 0 ? (
-                <EmptyState
-                  icon={<Search className="w-6 h-6" />}
-                  title="No matching product models found"
-                  description="Try adjusting your brand, shape, material, or verification filters."
-                  action={
-                    <Button variant="outline" size="sm" pill onClick={clearFilters}>
-                      Clear Search & Filters
-                    </Button>
-                  }
-                />
+                <div className="bg-white rounded-[32px] border border-[#E6E4DD] p-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-[#F0EFE9] flex items-center justify-center text-[#737373] mx-auto">
+                    <Glasses className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-base text-[#222222]">No Optical Models Found</h3>
+                  <p className="text-xs text-[#737373] max-w-sm mx-auto">
+                    No eyewear models match your active filter selection. Try clearing filters to view all records.
+                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className="px-4 py-2 rounded-full bg-[#292929] text-white text-xs font-semibold"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {models.map((model) => (
-                    <ModelCard key={model.slug} model={model} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                  {models.map((m) => (
+                    <ModelCard key={m.id} model={m} />
                   ))}
                 </div>
               )}
-            </div>
+            </section>
           </div>
-        )}
-      </div>
-    </AppShell>
-  );
+        </div>
+      )}
+    </div>
+  </AppShell>
+);
 }

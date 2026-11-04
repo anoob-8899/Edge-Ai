@@ -20,7 +20,7 @@ export async function POST(
     // Handle simulated guest sessions or offline mode
     if (id.startsWith("sim-sess-")) {
       const body = await request.json();
-      const { content } = body;
+      const content = body.content || body.message;
       const scenario = getScenarioById("scenario-polarization") || getScenarioById("scenario-high-index");
 
       let simReply = "That makes a lot of sense. I didn't realize polarized lenses work by specifically filtering horizontal glare like reflection off water or asphalt. Does it affect my car display screen though?";
@@ -88,7 +88,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { content } = body;
+    const content = body.content || body.message;
 
     if (!content || typeof content !== "string" || content.trim().length === 0) {
       return NextResponse.json({ error: "Message content cannot be empty" }, { status: 400 });
@@ -186,6 +186,11 @@ export async function POST(
         skillsPracticed: JSON.stringify(updatedSkills),
         contextualProducts: JSON.stringify(updatedProductSlugs),
         durationSeconds: Math.max(session.durationSeconds, elapsedSeconds),
+      },
+      include: {
+        messages: {
+          orderBy: { createdAt: "asc" },
+        },
       },
     });
 

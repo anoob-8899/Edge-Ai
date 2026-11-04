@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { FALLBACK_BRANDS } from "@/lib/mock-data";
+import { shouldFallbackToMock } from "@/lib/demo-mode";
 
 export async function GET() {
   try {
@@ -36,12 +37,23 @@ export async function GET() {
         };
       });
 
-      return NextResponse.json({ brands: enrichedBrands });
+      return NextResponse.json({ brands: enrichedBrands, isDemoData: false });
     }
 
-    return NextResponse.json({ brands: FALLBACK_BRANDS });
+    if (!shouldFallbackToMock()) {
+      return NextResponse.json({ brands: [], isDemoData: false });
+    }
+
+    return NextResponse.json({ brands: FALLBACK_BRANDS, isDemoData: true });
   } catch (error) {
-    console.warn("Serving fallback brands (PostgreSQL offline or unseeded):", error);
-    return NextResponse.json({ brands: FALLBACK_BRANDS });
+    if (!shouldFallbackToMock()) {
+      console.error("Database connection failure in /api/catalogue/brands:", error);
+      return NextResponse.json(
+        { error: "Database service unavailable. Real catalogue records cannot be retrieved.", code: "DATABASE_UNAVAILABLE" },
+        { status: 503 }
+      );
+    }
+    console.warn("[DEMO MODE] Serving fallback brands (PostgreSQL offline or unseeded):", error);
+    return NextResponse.json({ brands: FALLBACK_BRANDS, isDemoData: true });
   }
 }

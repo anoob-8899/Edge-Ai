@@ -946,6 +946,7 @@ export interface LeaderboardStaffEntry {
   quizzesPassed: number;
   simulationsCompleted: number;
   masteryPercent: number;
+  isDemoRecord?: boolean;
   tier: {
     tierName: string;
     level: number;
@@ -973,6 +974,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 18,
     simulationsCompleted: 42,
     masteryPercent: 98,
+    isDemoRecord: true,
     tier: {
       tierName: "Master Dispenser",
       level: 4,
@@ -998,6 +1000,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 16,
     simulationsCompleted: 36,
     masteryPercent: 92,
+    isDemoRecord: true,
     tier: {
       tierName: "Senior Dispenser",
       level: 3,
@@ -1023,6 +1026,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 14,
     simulationsCompleted: 29,
     masteryPercent: 88,
+    isDemoRecord: true,
     tier: {
       tierName: "Senior Dispenser",
       level: 3,
@@ -1048,6 +1052,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 12,
     simulationsCompleted: 24,
     masteryPercent: 82,
+    isDemoRecord: true,
     tier: {
       tierName: "Certified Dispenser",
       level: 2,
@@ -1073,6 +1078,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 10,
     simulationsCompleted: 18,
     masteryPercent: 75,
+    isDemoRecord: true,
     tier: {
       tierName: "Apprentice Optician",
       level: 1,
@@ -1098,6 +1104,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 9,
     simulationsCompleted: 16,
     masteryPercent: 71,
+    isDemoRecord: true,
     tier: {
       tierName: "Certified Dispenser",
       level: 2,
@@ -1123,6 +1130,7 @@ export const FALLBACK_LEADERBOARD: LeaderboardStaffEntry[] = [
     quizzesPassed: 8,
     simulationsCompleted: 12,
     masteryPercent: 65,
+    isDemoRecord: true,
     tier: {
       tierName: "Certified Dispenser",
       level: 2,

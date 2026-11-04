@@ -15,7 +15,7 @@ export function isDatabaseConfigured(): boolean {
 function createPrismaClient(): PrismaClient {
   const dbUrl =
     process.env.DATABASE_URL ||
-    "postgresql://postgres:password@localhost:5432/optitrain_dev?schema=public";
+    "postgresql://postgres:password@127.0.0.1:5432/optitrain_dev?schema=public";
 
   if (!dbUrl || dbUrl.trim().length === 0) {
     throw new Error(

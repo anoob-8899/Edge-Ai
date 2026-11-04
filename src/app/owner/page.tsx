@@ -694,9 +694,9 @@ export default function OwnerDashboardPage() {
             <div className="w-14 h-14 rounded-2xl bg-red-100 border border-red-200 text-[#C83F4F] flex items-center justify-center mx-auto">
               <ShieldAlert className="h-7 w-7" />
             </div>
-            <h2 className="text-xl font-bold text-[#172B4D]">Access Restricted to Practice Owners</h2>
-            <p className="text-sm text-[#65758B] leading-relaxed">
-              You are signed in as <strong className="text-[#172B4D]">{user?.name}</strong> with role{" "}
+            <h2 className="text-xl font-bold text-[#222222]">Access Restricted to Practice Owners</h2>
+            <p className="text-sm text-[#737373] leading-relaxed">
+              You are signed in as <strong className="text-[#222222]">{user?.name}</strong> with role{" "}
               <Badge variant="secondary" size="sm" isMono>{user?.role}</Badge>.
               Optical store financials, staff rosters, and management controls are restricted to Practice Owners.
             </p>
@@ -723,29 +723,30 @@ export default function OwnerDashboardPage() {
       subtitle="Staff administration, learning assignments, optical catalogue approvals & audit verification"
     >
       <div className="space-y-6">
-        {/* Practice Management Banner */}
-        <div className="rounded-[20px] p-6 md:p-8 bg-gradient-to-r from-white/95 via-[#F0F7FF]/90 to-[#E8F3FF]/85 border border-[#DCE8F5] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
+        {/* Practice Management Banner (Warm Pearl White & Editorial Charcoal) */}
+        <div className="rounded-[28px] p-6 md:p-8 bg-white border border-[#E6E4DD] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <Badge variant="primary" size="sm">
-                Owner Administration
+                Owner Operations
               </Badge>
               <Badge variant="secondary" size="sm" isMono>
                 {user?.clinicId || "APEX-OPTICS-HQ"}
               </Badge>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#172B4D] tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#222222] tracking-tight">
               Apex Eye Care & Optical Dispensary
             </h1>
-            <p className="text-sm text-[#65758B] max-w-xl">
+            <p className="text-xs sm:text-sm text-[#737373] max-w-xl leading-relaxed">
               Real-time oversight of staff opticians, active assignments, product approvals, and verified clinical audit trails.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <Button
-              variant="primary"
+              variant="dark"
               size="md"
+              pill
               onClick={() => setIsInviteDialogOpen(true)}
             >
               <UserPlus className="h-4 w-4" />
@@ -754,88 +755,82 @@ export default function OwnerDashboardPage() {
             <Button
               variant="outline"
               size="md"
+              pill
               onClick={() => setIsAssignmentDialogOpen(true)}
             >
-              <Calendar className="h-4 w-4 text-[#4285F4]" />
+              <Calendar className="h-4 w-4 text-[#737373]" />
               <span>Assign Learning</span>
             </Button>
             <Button
               variant="secondary"
               size="md"
+              pill
               onClick={loadAllData}
               disabled={isLoading}
             >
-              <RefreshCw className={`h-4 w-4 text-[#4285F4] ${isLoading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 text-[#737373] ${isLoading ? "animate-spin" : ""}`} />
               <span>Sync</span>
             </Button>
           </div>
         </div>
 
-        {/* Global KPI Summary */}
+        {/* Global KPI Summary (Authoritative Proportions & Tokens) */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card variant="glass">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#8796AA]">
-                <span>ENROLLED OPTICIANS</span>
-                <Users className="h-4 w-4 text-[#4285F4]" />
-              </div>
-              <div className="mt-2 text-2xl font-bold text-[#172B4D] font-mono">
-                {staffList.length}
-              </div>
-              <p className="mt-1 text-xs text-[#8796AA]">
-                {staffList.filter((s) => s.status === "ACTIVE").length} active in PostgreSQL
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-[#E6E4DD] rounded-[24px] p-5 shadow-xs">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#737373]">
+              <span>ENROLLED OPTICIANS</span>
+              <Users className="h-4 w-4 text-[#222222]" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-[#222222] font-mono">
+              {staffList.length}
+            </div>
+            <p className="mt-1 text-xs text-[#737373]">
+              {staffList.filter((s) => s.status === "ACTIVE").length} active in practice
+            </p>
+          </div>
 
-          <Card variant="glass">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#8796AA]">
-                <span>ACTIVE ASSIGNMENTS</span>
-                <Clock className="h-4 w-4 text-[#A96A08]" />
-              </div>
-              <div className="mt-2 text-2xl font-bold text-[#172B4D] font-mono">
-                {assignments.filter((a) => a.status === "PENDING" || a.status === "IN_PROGRESS").length}
-              </div>
-              <p className="mt-1 text-xs text-[#8796AA]">
-                {assignments.filter((a) => a.status === "COMPLETED").length} completed
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-[#E6E4DD] rounded-[24px] p-5 shadow-xs">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#737373]">
+              <span>ACTIVE ASSIGNMENTS</span>
+              <Clock className="h-4 w-4 text-[#92400E]" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-[#222222] font-mono">
+              {assignments.filter((a) => a.status === "PENDING" || a.status === "IN_PROGRESS").length}
+            </div>
+            <p className="mt-1 text-xs text-[#737373]">
+              {assignments.filter((a) => a.status === "COMPLETED").length} completed
+            </p>
+          </div>
 
-          <Card variant="glass">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#8796AA]">
-                <span>AWAITING APPROVAL</span>
-                <Eye className="h-4 w-4 text-[#C83F4F]" />
-              </div>
-              <div className="mt-2 text-2xl font-bold text-[#C83F4F] font-mono">
-                {pendingModels.length}
-              </div>
-              <p className="mt-1 text-xs text-[#8796AA]">
-                {models.filter((m) => m.approvalStatus === "APPROVED").length} approved models
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-[#E6E4DD] rounded-[24px] p-5 shadow-xs">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#737373]">
+              <span>AWAITING APPROVAL</span>
+              <Eye className="h-4 w-4 text-[#991B1B]" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-[#991B1B] font-mono">
+              {pendingModels.length}
+            </div>
+            <p className="mt-1 text-xs text-[#737373]">
+              {models.filter((m) => m.approvalStatus === "APPROVED").length} approved models
+            </p>
+          </div>
 
-          <Card variant="glass">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#8796AA]">
-                <span>AUDIT TRAIL LOGS</span>
-                <ShieldCheck className="h-4 w-4 text-[#16865C]" />
-              </div>
-              <div className="mt-2 text-2xl font-bold text-[#16865C] font-mono">
-                {auditLogs.length}
-              </div>
-              <p className="mt-1 text-xs text-[#8796AA]">
-                Strict server enforcement
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-[#E6E4DD] rounded-[24px] p-5 shadow-xs">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#737373]">
+              <span>AUDIT TRAIL LOGS</span>
+              <ShieldCheck className="h-4 w-4 text-[#255217]" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-[#255217] font-mono">
+              {auditLogs.length}
+            </div>
+            <p className="mt-1 text-xs text-[#737373]">
+              Server verified
+            </p>
+          </div>
         </div>
 
         {/* Tab Navigation Navigation (Pill Filter Bar matching Reference 1 & 2) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#E3E9EF]">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#E6E4DD]">
           {[
             { id: "overview", label: "Overview & Analytics", icon: TrendingUp },
             { id: "staff", label: `Staff Accounts (${staffList.length})`, icon: Users },
@@ -859,16 +854,18 @@ export default function OwnerDashboardPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 select-none ${
                   isActive
-                    ? "bg-[#242629] text-white shadow-xs"
-                    : "bg-white text-[#20242B] border border-[#E3E9EF] hover:bg-[#EEF3F7]"
+                    ? "bg-[#292929] text-white shadow-xs font-semibold"
+                    : "bg-white text-[#737373] border border-[#E6E4DD] hover:text-[#222222] hover:bg-[#F0EFE9]"
                 }`}
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className={`h-3.5 w-3.5 ${isActive ? "text-white" : "text-[#737373]"}`} />
                 <span>{tab.label}</span>
                 {tab.badge && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-[#FFD95E] text-[#20242B] text-[10px] font-bold">
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    isActive ? "bg-white/20 text-white" : "bg-[#FEE2E2] text-[#991B1B]"
+                  }`}>
                     {tab.badge}
                   </span>
                 )}
@@ -962,7 +959,7 @@ export default function OwnerDashboardPage() {
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-sm text-[#172B4D]">{staff.name}</span>
+                            <span className="font-semibold text-sm text-[#222222]">{staff.name}</span>
                             <Badge variant="secondary" size="sm">{staff.role}</Badge>
                             <Badge
                               variant={staff.status === "ACTIVE" ? "success" : "neutral"}
@@ -971,23 +968,23 @@ export default function OwnerDashboardPage() {
                             >
                               {staff.status}
                             </Badge>
-                            <span className="text-xs text-[#8796AA]">
+                            <span className="text-xs text-[#737373]">
                               Clinic: {staff.clinicId || "HQ"}
                             </span>
                           </div>
-                          <div className="text-xs text-[#65758B] flex items-center gap-2">
+                          <div className="text-xs text-[#737373] flex items-center gap-2">
                             <span>{staff.email}</span>
                             <span>•</span>
-                            <span className="font-mono text-[11px] text-[#8796AA]">
+                            <span className="font-mono text-[11px] text-[#737373]">
                               Enrolled: {new Date(staff.createdAt).toLocaleDateString()}
                             </span>
                           </div>
 
                           {/* Private Records (Owner Only) */}
                           {staff.privateRecords && staff.privateRecords.length > 0 && (
-                            <div className="mt-2 p-2.5 rounded-lg bg-[#F0F7FF] border border-[#DCE8F5] text-xs space-y-1">
-                              <div className="flex items-center gap-1.5 font-semibold text-[#172B4D]">
-                                <Lock className="h-3 w-3 text-[#4285F4]" />
+                            <div className="mt-2 p-2.5 rounded-lg bg-[#F5F4EF] border border-[#DCE8F5] text-xs space-y-1">
+                              <div className="flex items-center gap-1.5 font-semibold text-[#222222]">
+                                <Lock className="h-3 w-3 text-[#222222]" />
                                 <span>Confidential Supervisory Record:</span>
                                 {staff.privateRecords[0].confidentialSalaryOrBonusTier && (
                                   <span className="text-[#16865C] font-mono text-[11px]">
@@ -995,7 +992,7 @@ export default function OwnerDashboardPage() {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[#65758B] text-[11px]">{staff.privateRecords[0].notes}</p>
+                              <p className="text-[#737373] text-[11px]">{staff.privateRecords[0].notes}</p>
                             </div>
                           )}
                         </div>
@@ -1067,7 +1064,7 @@ export default function OwnerDashboardPage() {
                       >
                         <div className="space-y-1 max-w-xl">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-sm text-[#172B4D]">{assignment.title}</span>
+                            <span className="font-semibold text-sm text-[#222222]">{assignment.title}</span>
                             <Badge
                               variant={
                                 assignment.status === "COMPLETED"
@@ -1091,9 +1088,9 @@ export default function OwnerDashboardPage() {
                             )}
                           </div>
                           {assignment.notes && (
-                            <p className="text-xs text-[#65758B] leading-relaxed">{assignment.notes}</p>
+                            <p className="text-xs text-[#737373] leading-relaxed">{assignment.notes}</p>
                           )}
-                          <div className="flex items-center gap-3 text-xs text-[#8796AA] font-mono flex-wrap">
+                          <div className="flex items-center gap-3 text-xs text-[#737373] font-mono flex-wrap">
                             <span>Assignee: <strong>{assignment.assignedTo.name}</strong></span>
                             {assignment.dueDate && (
                               <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
@@ -1162,10 +1159,10 @@ export default function OwnerDashboardPage() {
                         </div>
 
                         <div>
-                          <h4 className="font-bold text-sm text-[#172B4D]">
+                          <h4 className="font-bold text-sm text-[#222222]">
                             {model.officialProductName}
                           </h4>
-                          <span className="text-xs text-[#8796AA] font-mono">
+                          <span className="text-xs text-[#737373] font-mono">
                             Model Code: {model.modelCode}
                           </span>
                         </div>
@@ -1187,7 +1184,7 @@ export default function OwnerDashboardPage() {
                         </div>
 
                         <div className="pt-2 flex items-center justify-between border-t border-[#DCE8F5]">
-                          <span className="text-[11px] text-[#8796AA]">
+                          <span className="text-[11px] text-[#737373]">
                             Verification: <strong>{model.verificationStatus}</strong>
                           </span>
                           <Button
@@ -1234,15 +1231,15 @@ export default function OwnerDashboardPage() {
                       className="p-4 rounded-xl bg-white/90 border border-[#DCE8F5] shadow-xs space-y-2"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-[#172B4D]">{b.name}</span>
+                        <span className="font-bold text-sm text-[#222222]">{b.name}</span>
                         <Badge variant="primary" size="sm" isMono>
                           {b.totalModels} Models
                         </Badge>
                       </div>
-                      <p className="text-xs text-[#65758B] line-clamp-2">
+                      <p className="text-xs text-[#737373] line-clamp-2">
                         {b.heritage || "Premium optical manufacturer."}
                       </p>
-                      <div className="text-[11px] text-[#8796AA] flex items-center justify-between pt-1 font-mono">
+                      <div className="text-[11px] text-[#737373] flex items-center justify-between pt-1 font-mono">
                         <span>Origin: {b.countryOfOrigin || "Italy / USA"}</span>
                         <span className="text-[#16865C]">{b.approvedCount} Approved</span>
                       </div>
@@ -1284,24 +1281,24 @@ export default function OwnerDashboardPage() {
                     <div key={cat.id} className="p-4 rounded-xl bg-white/80 border border-[#DCE8F5] space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Glasses className="h-4 w-4 text-[#4285F4]" />
-                          <h4 className="font-bold text-sm text-[#172B4D]">{cat.name}</h4>
+                          <Glasses className="h-4 w-4 text-[#222222]" />
+                          <h4 className="font-bold text-sm text-[#222222]">{cat.name}</h4>
                         </div>
                         <Badge variant="secondary" size="sm">
                           {cat.subcategories.length} Subcategories
                         </Badge>
                       </div>
-                      <p className="text-xs text-[#65758B]">{cat.description}</p>
+                      <p className="text-xs text-[#737373]">{cat.description}</p>
 
                       <div className="pl-4 border-l-2 border-[#DCE8F5] space-y-2 mt-2">
                         {cat.subcategories.map((sub) => (
                           <div key={sub.id} className="text-xs space-y-1">
-                            <span className="font-semibold text-[#172B4D]">{sub.name}</span>
+                            <span className="font-semibold text-[#222222]">{sub.name}</span>
                             <div className="flex flex-wrap gap-2">
                               {sub.lessons.map((lesson) => (
                                 <span
                                   key={lesson.id}
-                                  className="px-2 py-1 rounded bg-[#F0F7FF] text-[#172B4D] text-[11px] border border-[#DCE8F5] flex items-center gap-1.5"
+                                  className="px-2 py-1 rounded bg-[#F5F4EF] text-[#222222] text-[11px] border border-[#DCE8F5] flex items-center gap-1.5"
                                 >
                                   <span>{lesson.title}</span>
                                   <Badge variant="primary" size="sm" isMono>
@@ -1338,11 +1335,11 @@ export default function OwnerDashboardPage() {
                   {quizQuestions.map((q) => (
                     <div key={q.id} className="py-3 flex items-start justify-between gap-4">
                       <div className="space-y-1">
-                        <div className="text-xs text-[#8796AA]">
-                          Lesson: <strong className="text-[#172B4D]">{q.lesson.title}</strong>
+                        <div className="text-xs text-[#737373]">
+                          Lesson: <strong className="text-[#222222]">{q.lesson.title}</strong>
                         </div>
-                        <p className="text-xs font-semibold text-[#172B4D]">{q.question}</p>
-                        <p className="text-[11px] text-[#65758B]">
+                        <p className="text-xs font-semibold text-[#222222]">{q.question}</p>
+                        <p className="text-[11px] text-[#737373]">
                           Explanation: {q.explanation}
                         </p>
                       </div>
@@ -1390,7 +1387,7 @@ export default function OwnerDashboardPage() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs text-left">
-                      <thead className="bg-[#F8FAFC] text-[#65758B] border-b border-[#DCE8F5]">
+                      <thead className="bg-[#F8FAFC] text-[#737373] border-b border-[#DCE8F5]">
                         <tr>
                           <th className="p-3 font-semibold">Staff Optician</th>
                           <th className="p-3 font-semibold">Status</th>
@@ -1404,10 +1401,10 @@ export default function OwnerDashboardPage() {
                       </thead>
                       <tbody className="divide-y divide-[#DCE8F5]">
                         {reports.map((r) => (
-                          <tr key={r.id} className="hover:bg-[#F0F7FF]/50 transition-colors">
-                            <td className="p-3 font-semibold text-[#172B4D]">
+                          <tr key={r.id} className="hover:bg-[#F5F4EF]/50 transition-colors">
+                            <td className="p-3 font-semibold text-[#222222]">
                               <div>{r.name}</div>
-                              <span className="text-[11px] text-[#8796AA] font-normal">{r.email}</span>
+                              <span className="text-[11px] text-[#737373] font-normal">{r.email}</span>
                             </td>
                             <td className="p-3">
                               <Badge
@@ -1471,7 +1468,7 @@ export default function OwnerDashboardPage() {
               </CardHeader>
               <CardContent>
                 {assessmentData.learningGaps.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-[#8796AA] bg-[#F0F7FF] rounded-xl border border-[#DCE8F5]">
+                  <div className="p-6 text-center text-xs text-[#737373] bg-[#F5F4EF] rounded-xl border border-[#DCE8F5]">
                     No critical learning gaps identified. Staff members are meeting optical competency standards.
                   </div>
                 ) : (
@@ -1483,7 +1480,7 @@ export default function OwnerDashboardPage() {
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#172B4D]">{gap.area}</span>
+                            <span className="font-bold text-[#222222]">{gap.area}</span>
                             <Badge
                               variant={gap.severity === "HIGH" ? "error" : "neutral"}
                               size="sm"
@@ -1491,10 +1488,10 @@ export default function OwnerDashboardPage() {
                             >
                               {gap.severity} PRIORITY
                             </Badge>
-                            <span className="text-[#8796AA]">Staff: {gap.staffName}</span>
+                            <span className="text-[#737373]">Staff: {gap.staffName}</span>
                           </div>
-                          <p className="text-[#65758B]">{gap.notes}</p>
-                          <div className="text-[11px] text-[#8796AA] font-mono">
+                          <p className="text-[#737373]">{gap.notes}</p>
+                          <div className="text-[11px] text-[#737373] font-mono">
                             Detected in: {gap.observedIn} • {new Date(gap.detectedAt).toLocaleDateString()}
                           </div>
                         </div>
@@ -1527,7 +1524,7 @@ export default function OwnerDashboardPage() {
               </CardHeader>
               <CardContent>
                 {assessmentData.sessions.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-[#8796AA] bg-[#F0F7FF] rounded-xl border border-[#DCE8F5]">
+                  <div className="p-6 text-center text-xs text-[#737373] bg-[#F5F4EF] rounded-xl border border-[#DCE8F5]">
                     No completed AI Sales Coach simulations logged yet in the database.
                   </div>
                 ) : (
@@ -1535,22 +1532,22 @@ export default function OwnerDashboardPage() {
                     {assessmentData.sessions.map((sess) => (
                       <div key={sess.id} className="py-3 flex items-center justify-between text-xs">
                         <div className="space-y-0.5">
-                          <div className="font-semibold text-sm text-[#172B4D] flex items-center gap-2">
+                          <div className="font-semibold text-sm text-[#222222] flex items-center gap-2">
                             <span>{sess.scenarioTitle}</span>
                             <Badge variant="primary" size="sm">
                               Score: {sess.score !== null ? `${sess.score}%` : "Pending"}
                             </Badge>
                           </div>
-                          <div className="text-[#65758B]">
+                          <div className="text-[#737373]">
                             Optician: <strong>{sess.staffName}</strong> ({sess.staffEmail}) • Duration: {Math.round(sess.durationSeconds / 60)} min
                           </div>
                           {sess.feedbackSummary && (
-                            <p className="text-[11px] text-[#8796AA] italic line-clamp-1">
+                            <p className="text-[11px] text-[#737373] italic line-clamp-1">
                               &ldquo;{sess.feedbackSummary}&rdquo;
                             </p>
                           )}
                         </div>
-                        <div className="text-[11px] font-mono text-[#8796AA]">
+                        <div className="text-[11px] font-mono text-[#737373]">
                           {sess.completedAt ? new Date(sess.completedAt).toLocaleDateString() : ""}
                         </div>
                       </div>
@@ -1581,13 +1578,13 @@ export default function OwnerDashboardPage() {
               </CardHeader>
               <CardContent>
                 {auditLogs.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-[#8796AA] bg-[#F0F7FF] rounded-xl border border-[#DCE8F5]">
+                  <div className="p-6 text-center text-xs text-[#737373] bg-[#F5F4EF] rounded-xl border border-[#DCE8F5]">
                     No audit records logged yet.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs text-left">
-                      <thead className="bg-[#F8FAFC] text-[#65758B] border-b border-[#DCE8F5]">
+                      <thead className="bg-[#F8FAFC] text-[#737373] border-b border-[#DCE8F5]">
                         <tr>
                           <th className="p-3 font-semibold">Timestamp</th>
                           <th className="p-3 font-semibold">Action</th>
@@ -1598,8 +1595,8 @@ export default function OwnerDashboardPage() {
                       </thead>
                       <tbody className="divide-y divide-[#DCE8F5]">
                         {auditLogs.map((log) => (
-                          <tr key={log.id} className="hover:bg-[#F0F7FF]/50 transition-colors">
-                            <td className="p-3 font-mono text-[11px] text-[#8796AA]">
+                          <tr key={log.id} className="hover:bg-[#F5F4EF]/50 transition-colors">
+                            <td className="p-3 font-mono text-[11px] text-[#737373]">
                               {new Date(log.createdAt).toLocaleString()}
                             </td>
                             <td className="p-3 font-mono">
@@ -1607,13 +1604,13 @@ export default function OwnerDashboardPage() {
                                 {log.action}
                               </Badge>
                             </td>
-                            <td className="p-3 font-semibold text-[#172B4D]">
+                            <td className="p-3 font-semibold text-[#222222]">
                               {log.user ? `${log.user.name} (${log.user.role})` : "System / Unauthenticated"}
                             </td>
-                            <td className="p-3 font-mono text-[#8796AA]">
+                            <td className="p-3 font-mono text-[#737373]">
                               {log.ipAddress || "127.0.0.1"}
                             </td>
-                            <td className="p-3 font-mono text-[11px] text-[#65758B] max-w-xs truncate">
+                            <td className="p-3 font-mono text-[11px] text-[#737373] max-w-xs truncate">
                               {log.metadata ? JSON.stringify(log.metadata) : "-"}
                             </td>
                           </tr>
@@ -1652,7 +1649,7 @@ export default function OwnerDashboardPage() {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">
+            <label className="block text-xs font-medium text-[#222222] mb-1">
               Optician Full Name
             </label>
             <Input
@@ -1664,7 +1661,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">
+            <label className="block text-xs font-medium text-[#222222] mb-1">
               Store Email Address
             </label>
             <Input
@@ -1677,7 +1674,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">
+            <label className="block text-xs font-medium text-[#222222] mb-1">
               Initial Password (min 8 characters)
             </label>
             <Input
@@ -1690,7 +1687,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">
+            <label className="block text-xs font-medium text-[#222222] mb-1">
               Confidential Onboarding Note (Owner Eyes Only)
             </label>
             <Input
@@ -1723,7 +1720,7 @@ export default function OwnerDashboardPage() {
       >
         <form onSubmit={handleCreateAssignment} className="space-y-3 pt-2">
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Assignment Title</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Assignment Title</label>
             <Input
               required
               value={assignTitle}
@@ -1734,11 +1731,11 @@ export default function OwnerDashboardPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">Activity Type</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">Activity Type</label>
               <select
                 value={assignActivityType}
                 onChange={(e) => setAssignActivityType(e.target.value as any)}
-                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#172B4D] outline-hidden focus:border-[#4285F4]"
+                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#222222] outline-hidden focus:border-[#222222]"
               >
                 <option value="LESSON">Optical Lesson</option>
                 <option value="QUIZ">Quiz Knowledge Check</option>
@@ -1747,11 +1744,11 @@ export default function OwnerDashboardPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">Target Audience</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">Target Audience</label>
               <select
                 value={assignTargetType}
                 onChange={(e) => setAssignTargetType(e.target.value as any)}
-                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#172B4D] outline-hidden focus:border-[#4285F4]"
+                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#222222] outline-hidden focus:border-[#222222]"
               >
                 <option value="GROUP">Entire Staff Group (All Active Staff)</option>
                 <option value="INDIVIDUAL">Individual Staff Optician</option>
@@ -1761,12 +1758,12 @@ export default function OwnerDashboardPage() {
 
           {assignTargetType === "INDIVIDUAL" && (
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">Select Optician</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">Select Optician</label>
               <select
                 required
                 value={assignTargetStaffId}
                 onChange={(e) => setAssignTargetStaffId(e.target.value)}
-                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#172B4D] outline-hidden focus:border-[#4285F4]"
+                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#222222] outline-hidden focus:border-[#222222]"
               >
                 <option value="">Choose an active staff member...</option>
                 {staffList.filter((s) => s.status === "ACTIVE").map((s) => (
@@ -1780,11 +1777,11 @@ export default function OwnerDashboardPage() {
 
           {assignActivityType !== "OPTICOACH_SCENARIO" ? (
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">Select Lesson Module</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">Select Lesson Module</label>
               <select
                 value={assignLessonId}
                 onChange={(e) => setAssignLessonId(e.target.value)}
-                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#172B4D] outline-hidden focus:border-[#4285F4]"
+                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#222222] outline-hidden focus:border-[#222222]"
               >
                 <option value="">Choose a curriculum lesson...</option>
                 {allLessons.map((l) => (
@@ -1796,11 +1793,11 @@ export default function OwnerDashboardPage() {
             </div>
           ) : (
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">AI Sales Coach Scenario</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">AI Sales Coach Scenario</label>
               <select
                 value={assignScenarioId}
                 onChange={(e) => setAssignScenarioId(e.target.value)}
-                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#172B4D] outline-hidden focus:border-[#4285F4]"
+                className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#222222] outline-hidden focus:border-[#222222]"
               >
                 <option value="">Choose patient scenario...</option>
                 <option value="first-time-buyer">Maya Lin (First-Time Eyewear Buyer)</option>
@@ -1817,7 +1814,7 @@ export default function OwnerDashboardPage() {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Assignment Due Date (Deadline)</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Assignment Due Date (Deadline)</label>
             <Input
               type="date"
               value={assignDueDate}
@@ -1826,7 +1823,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Owner Guidance & Instructions</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Owner Guidance & Instructions</label>
             <Textarea
               rows={2}
               value={assignNotes}
@@ -1859,7 +1856,7 @@ export default function OwnerDashboardPage() {
         >
           <div className="space-y-4 pt-2">
             <div>
-              <label className="text-xs font-semibold text-[#172B4D] block mb-1">Approval Decision</label>
+              <label className="text-xs font-semibold text-[#222222] block mb-1">Approval Decision</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
@@ -1867,7 +1864,7 @@ export default function OwnerDashboardPage() {
                   className={`p-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
                     reviewDecision === "APPROVED"
                       ? "bg-emerald-50 border-emerald-500 text-emerald-800 ring-2 ring-emerald-200"
-                      : "bg-white border-[#DCE8F5] text-[#65758B]"
+                      : "bg-white border-[#DCE8F5] text-[#737373]"
                   }`}
                 >
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -1879,7 +1876,7 @@ export default function OwnerDashboardPage() {
                   className={`p-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
                     reviewDecision === "PENDING_REVIEW"
                       ? "bg-amber-50 border-amber-500 text-amber-800 ring-2 ring-amber-200"
-                      : "bg-white border-[#DCE8F5] text-[#65758B]"
+                      : "bg-white border-[#DCE8F5] text-[#737373]"
                   }`}
                 >
                   <Clock className="w-4 h-4 text-amber-600" />
@@ -1891,7 +1888,7 @@ export default function OwnerDashboardPage() {
                   className={`p-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
                     reviewDecision === "REJECTED"
                       ? "bg-rose-50 border-rose-500 text-rose-800 ring-2 ring-rose-200"
-                      : "bg-white border-[#DCE8F5] text-[#65758B]"
+                      : "bg-white border-[#DCE8F5] text-[#737373]"
                   }`}
                 >
                   <XCircle className="w-4 h-4 text-rose-600" />
@@ -1902,7 +1899,7 @@ export default function OwnerDashboardPage() {
 
             {/* Specification Checkmarks */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#172B4D] block">
+              <label className="text-xs font-semibold text-[#222222] block">
                 Technical Specification Certification Checkmarks
               </label>
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -1911,7 +1908,7 @@ export default function OwnerDashboardPage() {
                     type="checkbox"
                     checked={verifiedShape}
                     onChange={(e) => setVerifiedShape(e.target.checked)}
-                    className="rounded text-[#4285F4]"
+                    className="rounded text-[#222222]"
                   />
                   <span>Shape: {selectedModelForReview.frameShape}</span>
                 </label>
@@ -1920,7 +1917,7 @@ export default function OwnerDashboardPage() {
                     type="checkbox"
                     checked={verifiedMaterial}
                     onChange={(e) => setVerifiedMaterial(e.target.checked)}
-                    className="rounded text-[#4285F4]"
+                    className="rounded text-[#222222]"
                   />
                   <span>Material: {selectedModelForReview.frameMaterial || "Acetate/Metal"}</span>
                 </label>
@@ -1929,7 +1926,7 @@ export default function OwnerDashboardPage() {
                     type="checkbox"
                     checked={verifiedColor}
                     onChange={(e) => setVerifiedColor(e.target.checked)}
-                    className="rounded text-[#4285F4]"
+                    className="rounded text-[#222222]"
                   />
                   <span>Lens Color: {selectedModelForReview.lensColor || "G-15 / Grey"}</span>
                 </label>
@@ -1938,7 +1935,7 @@ export default function OwnerDashboardPage() {
                     type="checkbox"
                     checked={verifiedLensMat}
                     onChange={(e) => setVerifiedLensMat(e.target.checked)}
-                    className="rounded text-[#4285F4]"
+                    className="rounded text-[#222222]"
                   />
                   <span>Lens Mat: {selectedModelForReview.lensMaterial || "Crystal"}</span>
                 </label>
@@ -1947,7 +1944,7 @@ export default function OwnerDashboardPage() {
                     type="checkbox"
                     checked={verifiedUv}
                     onChange={(e) => setVerifiedUv(e.target.checked)}
-                    className="rounded text-[#4285F4]"
+                    className="rounded text-[#222222]"
                   />
                   <span>UV Protection Verified</span>
                 </label>
@@ -1956,7 +1953,7 @@ export default function OwnerDashboardPage() {
                     type="checkbox"
                     checked={verifiedPol}
                     onChange={(e) => setVerifiedPol(e.target.checked)}
-                    className="rounded text-[#4285F4]"
+                    className="rounded text-[#222222]"
                   />
                   <span>Polarization Verified</span>
                 </label>
@@ -1964,7 +1961,7 @@ export default function OwnerDashboardPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#172B4D] mb-1">
+              <label className="block text-xs font-semibold text-[#222222] mb-1">
                 Owner Dispensing & Educational Feedback Notes
               </label>
               <Textarea
@@ -2003,7 +2000,7 @@ export default function OwnerDashboardPage() {
       >
         <form onSubmit={handleAddBrand} className="space-y-3 pt-2">
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Brand Name</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Brand Name</label>
             <Input
               required
               value={brandName}
@@ -2016,7 +2013,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Brand Slug</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Brand Slug</label>
             <Input
               required
               value={brandSlug}
@@ -2027,7 +2024,7 @@ export default function OwnerDashboardPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">Country of Origin</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">Country of Origin</label>
               <Input
                 value={brandOrigin}
                 onChange={(e) => setBrandOrigin(e.target.value)}
@@ -2035,7 +2032,7 @@ export default function OwnerDashboardPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#172B4D] mb-1">Parent Group</label>
+              <label className="block text-xs font-medium text-[#222222] mb-1">Parent Group</label>
               <Input
                 value={brandParent}
                 onChange={(e) => setBrandParent(e.target.value)}
@@ -2045,7 +2042,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Heritage & Optical Profile</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Heritage & Optical Profile</label>
             <Textarea
               rows={2}
               value={brandHeritage}
@@ -2076,7 +2073,7 @@ export default function OwnerDashboardPage() {
       >
         <form onSubmit={handleAddCategory} className="space-y-3 pt-2">
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Category Name</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Category Name</label>
             <Input
               required
               value={categoryName}
@@ -2089,7 +2086,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Slug</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Slug</label>
             <Input
               required
               value={categorySlug}
@@ -2099,7 +2096,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Description</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Description</label>
             <Textarea
               rows={2}
               required
@@ -2131,12 +2128,12 @@ export default function OwnerDashboardPage() {
       >
         <form onSubmit={handleAddQuizQuestion} className="space-y-3 pt-2">
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Target Lesson Module</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Target Lesson Module</label>
             <select
               required
               value={quizLessonId}
               onChange={(e) => setQuizLessonId(e.target.value)}
-              className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#172B4D] outline-hidden focus:border-[#4285F4]"
+              className="w-full text-xs rounded-xl border border-[#DCE8F5] p-2.5 bg-white text-[#222222] outline-hidden focus:border-[#222222]"
             >
               <option value="">Select a lesson...</option>
               {allLessons.map((l) => (
@@ -2148,7 +2145,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Question Text</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Question Text</label>
             <Input
               required
               value={quizQuestionText}
@@ -2158,7 +2155,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-medium text-[#172B4D]">Options (Select the correct answer button)</label>
+            <label className="block text-xs font-medium text-[#222222]">Options (Select the correct answer button)</label>
             {[
               { val: quizOpt0, setVal: setQuizOpt0, idx: 0 },
               { val: quizOpt1, setVal: setQuizOpt1, idx: 1 },
@@ -2171,7 +2168,7 @@ export default function OwnerDashboardPage() {
                   name="quizCorrectOption"
                   checked={quizCorrectIdx === idx}
                   onChange={() => setQuizCorrectIdx(idx)}
-                  className="text-[#4285F4]"
+                  className="text-[#222222]"
                 />
                 <Input
                   required
@@ -2185,7 +2182,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#172B4D] mb-1">Educational Optical Explanation</label>
+            <label className="block text-xs font-medium text-[#222222] mb-1">Educational Optical Explanation</label>
             <Textarea
               rows={2}
               required
@@ -2208,3 +2205,4 @@ export default function OwnerDashboardPage() {
     </AppShell>
   );
 }
+

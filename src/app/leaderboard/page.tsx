@@ -7,18 +7,17 @@ import {
   Search,
   Award,
   Sparkles,
-  ArrowUpRight,
   CheckCircle2,
   Building2,
   Users,
   Target,
+  ChevronDown,
+  Plus,
+  SlidersHorizontal,
+  Download,
+  Check,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { FilterPill } from "@/components/shared/filter-pill";
-import { ProgressBar } from "@/components/shared/progress-bar";
 import { StaffAvatar } from "@/components/shared/staff-avatar";
 import { useAuth } from "@/components/auth/auth-context";
 
@@ -46,11 +45,13 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = React.useState<LeaderboardEntry[]>([]);
   const [myStanding, setMyStanding] = React.useState<LeaderboardEntry | null>(null);
   const [totalParticipants, setTotalParticipants] = React.useState(0);
+  const [isDemoData, setIsDemoData] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 
   // Filters state
   const [period, setPeriod] = React.useState<"week" | "month" | "all">("month");
   const [selectedBranch, setSelectedBranch] = React.useState<string>("all");
+  const [selectedTier, setSelectedTier] = React.useState<string>("all");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null);
 
@@ -61,9 +62,9 @@ export default function LeaderboardPage() {
       if (res.ok) {
         const data = await res.json();
         setLeaderboard(data.leaderboard || []);
+        setIsDemoData(Boolean(data.isDemoData));
         setMyStanding(data.myStanding || null);
         setTotalParticipants(data.totalParticipants || (data.leaderboard ? data.leaderboard.length : 0));
-        // Auto-select current user or top performer
         if (data.myStanding) {
           setSelectedUserId(data.myStanding.userId);
         } else if (data.leaderboard?.length > 0) {
@@ -81,13 +82,16 @@ export default function LeaderboardPage() {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
 
-  // Unique clinic/branches list
   const branches = React.useMemo(() => {
     const list = Array.from(new Set(leaderboard.map((e) => e.clinicId).filter(Boolean)));
     return ["all", ...list];
   }, [leaderboard]);
 
-  // Filtered leaderboard
+  const tiers = React.useMemo(() => {
+    const list = Array.from(new Set(leaderboard.map((e) => e.tier?.tierName).filter(Boolean)));
+    return ["all", ...list];
+  }, [leaderboard]);
+
   const filteredLeaderboard = React.useMemo(() => {
     return leaderboard.filter((entry) => {
       const matchesSearch =
@@ -95,11 +99,11 @@ export default function LeaderboardPage() {
         entry.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.clinicId.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesBranch = selectedBranch === "all" || entry.clinicId === selectedBranch;
-      return matchesSearch && matchesBranch;
+      const matchesTier = selectedTier === "all" || entry.tier?.tierName === selectedTier;
+      return matchesSearch && matchesBranch && matchesTier;
     });
-  }, [leaderboard, searchQuery, selectedBranch]);
+  }, [leaderboard, searchQuery, selectedBranch, selectedTier]);
 
-  // Sort: weekly vs all-time points based on period
   const sortedLeaderboard = React.useMemo(() => {
     return [...filteredLeaderboard].sort((a, b) => {
       if (period === "week") {
@@ -109,10 +113,6 @@ export default function LeaderboardPage() {
     });
   }, [filteredLeaderboard, period]);
 
-  // Current selected user details
-  const selectedUser = sortedLeaderboard.find((u) => u.userId === selectedUserId) || sortedLeaderboard[0] || myStanding;
-
-  // Calculate practice-wide aggregate stats
   const totalVerifiedPoints = leaderboard.reduce((acc, curr) => acc + curr.totalPoints, 0);
   const avgCompletion = leaderboard.length > 0
     ? Math.round(leaderboard.reduce((acc, curr) => acc + (curr.tier.progressPercent || 0), 0) / leaderboard.length)
@@ -120,133 +120,192 @@ export default function LeaderboardPage() {
 
   return (
     <AppShell
-      title="Performance Leaderboard"
+      title="Staff Performance Leaderboard"
       subtitle="Audited dispensing points, weekly rankings & team mastery"
     >
       <div className="space-y-6">
-        {/* Top Summary Metrics Bar (Reference 1 Inspiration) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-[#242629] text-white rounded-[20px] p-4 flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Active Staff</p>
-              <h3 className="text-2xl font-bold mt-0.5">{totalParticipants}</h3>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
-              <Users className="h-5 w-5" />
-            </div>
-          </div>
-
-          <div className="bg-[#FFD95E] text-[#20242B] rounded-[20px] p-4 flex items-center justify-between shadow-xs">
-            <div>
-              <p className="text-[11px] font-semibold text-[#20242B]/80 uppercase tracking-wider">My Standing</p>
-              <h3 className="text-2xl font-bold mt-0.5">
-                {myStanding
-                  ? `#${leaderboard.findIndex((e) => e.userId === myStanding.userId) + 1 || 1}`
-                  : "Rank #1"}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/40 flex items-center justify-center text-[#20242B]">
-              <Trophy className="h-5 w-5" />
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#E3E9EF] rounded-[20px] p-4 flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-medium text-[#737D8B] uppercase tracking-wider">Total Points</p>
-              <h3 className="text-2xl font-bold text-[#20242B] mt-0.5">{totalVerifiedPoints.toLocaleString()}</h3>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-[#EEF3F7] flex items-center justify-center text-[#20242B]">
-              <Target className="h-5 w-5" />
+        {/* Top Header Section (Reference 1 Composition: Large Heading + Segmented Metric Bar + Actions) */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-2">
+          <div className="space-y-3">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#222222]">
+              People & Performance
+            </h1>
+            
+            {/* Segmented Progress Metric Pill Bar (Faithful to Reference 1) */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#292929] text-white text-xs font-semibold shadow-xs">
+                <span className="text-gray-400 font-normal">Active Staff</span>
+                <span>{totalParticipants || leaderboard.length}</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FFD95E] text-[#222222] text-xs font-bold shadow-xs">
+                <span>Avg Mastery</span>
+                <span>{avgCompletion}%</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E6E4DD] text-xs font-medium text-[#737373]">
+                <span>Total Points</span>
+                <span className="font-semibold text-[#222222]">{totalVerifiedPoints.toLocaleString()}</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F0EFE9] border border-[#E6E4DD] text-xs font-medium text-[#737373]">
+                <span>Timeline</span>
+                <span className="font-semibold text-[#222222] capitalize">{period}</span>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white border border-[#E3E9EF] rounded-[20px] p-4 flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-medium text-[#737D8B] uppercase tracking-wider">Avg Mastery</p>
-              <h3 className="text-2xl font-bold text-[#20242B] mt-0.5">{avgCompletion}%</h3>
+          {/* Right Action Pills (Reference 1) */}
+          <div className="flex flex-wrap items-center gap-2 shrink-0 self-start lg:self-center">
+            {/* Timeline Filter Pill Dropdown */}
+            <div className="flex items-center bg-white border border-[#E6E4DD] rounded-full p-1 shadow-xs">
+              <button
+                onClick={() => setPeriod("week")}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  period === "week" ? "bg-[#292929] text-white" : "text-[#737373] hover:text-[#222222]"
+                }`}
+              >
+                Weekly
+              </button>
+              <button
+                onClick={() => setPeriod("month")}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  period === "month" ? "bg-[#292929] text-white" : "text-[#737373] hover:text-[#222222]"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setPeriod("all")}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  period === "all" ? "bg-[#292929] text-white" : "text-[#737373] hover:text-[#222222]"
+                }`}
+              >
+                All-Time
+              </button>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#DDF4CF] flex items-center justify-center text-[#225414]">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const csvData = sortedLeaderboard.map((e, idx) => `${idx + 1},${e.name},${e.clinicId},${e.totalPoints}`).join("\n");
+                const blob = new Blob([`Rank,Name,Clinic,Points\n${csvData}`], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `optitrain-leaderboard-${period}.csv`;
+                a.click();
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white border border-[#E6E4DD] text-xs font-medium text-[#222222] hover:bg-[#F0EFE9] transition-all shadow-xs"
+            >
+              <Download className="h-3.5 w-3.5 text-[#737373]" />
+              <span>Export</span>
+            </button>
+
+            <Link href="/opticoach">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FFD95E] hover:bg-[#F2CD52] text-[#222222] text-xs font-bold transition-all shadow-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Simulate Practice</span>
+              </button>
+            </Link>
           </div>
         </div>
 
-        {/* Filter and Search Bar Controls (Crextio Pill Style) */}
-        <div className="bg-white border border-[#E3E9EF] rounded-[20px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Left Pill Selectors */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-[#737D8B] mr-1 hidden sm:inline">Timeline:</span>
-            <FilterPill
-              label="This Week"
-              active={period === "week"}
-              onClick={() => setPeriod("week")}
-            />
-            <FilterPill
-              label="This Month"
-              active={period === "month"}
-              onClick={() => setPeriod("month")}
-            />
-            <FilterPill
-              label="All-Time"
-              active={period === "all"}
-              onClick={() => setPeriod("all")}
-            />
+        {/* Main Ranking Table Card Container (Reference 1: Spacious White Rounded Container with Internal Filters) */}
+        <div className="bg-white rounded-[32px] border border-[#E6E4DD] p-5 md:p-8 shadow-sm space-y-6">
+          {/* Demonstration Record Indicator */}
+          {isDemoData && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#FFF8E1] border border-[#FFE082] text-xs text-[#7A5300]">
+              <span className="w-2 h-2 rounded-full bg-[#EAB308] shrink-0" />
+              <span className="font-semibold">Demonstration Benchmark Dataset:</span>
+              <span>Showing optical practice performance references. Real patient and employee identities are protected.</span>
+            </div>
+          )}
 
-            <div className="h-5 w-px bg-[#E3E9EF] mx-1 hidden sm:block" />
+          {/* Inner Filter Row: Pill Selectors & Search Input */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-[#E6E4DD]/60">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Branch Filter */}
+              <div className="relative">
+                <select
+                  value={selectedBranch}
+                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  className="appearance-none pl-3.5 pr-8 py-1.5 bg-[#F0EFE9] text-xs font-medium text-[#222222] rounded-full border border-transparent hover:border-[#E6E4DD] focus:outline-none focus:border-[#292929] transition-all cursor-pointer"
+                >
+                  <option value="all">Clinic: All Branches</option>
+                  {branches.filter((b) => b !== "all").map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#737373] pointer-events-none" />
+              </div>
 
-            <span className="text-xs font-semibold text-[#737D8B] mr-1 hidden md:inline">Branch:</span>
-            {branches.map((b) => (
-              <FilterPill
-                key={b}
-                label={b === "all" ? "All Clinics" : b}
-                active={selectedBranch === b}
-                onClick={() => setSelectedBranch(b)}
+              {/* Tier Filter */}
+              <div className="relative">
+                <select
+                  value={selectedTier}
+                  onChange={(e) => setSelectedTier(e.target.value)}
+                  className="appearance-none pl-3.5 pr-8 py-1.5 bg-[#F0EFE9] text-xs font-medium text-[#222222] rounded-full border border-transparent hover:border-[#E6E4DD] focus:outline-none focus:border-[#292929] transition-all cursor-pointer"
+                >
+                  <option value="all">Tier: All Levels</option>
+                  {tiers.filter((t) => t !== "all").map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#737373] pointer-events-none" />
+              </div>
+
+              {/* Status Indicator */}
+              <div className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#EAF5D5] text-[#255217] text-xs font-medium">
+                <span className="w-2 h-2 rounded-full bg-[#255217]" />
+                <span>Live Audited</span>
+              </div>
+            </div>
+
+            {/* Rounded Search Input (Reference 1 Style) */}
+            <div className="relative min-w-[240px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#737373]" />
+              <input
+                type="text"
+                placeholder="Search staff, clinic or role..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-9 pl-9 pr-4 text-xs rounded-full bg-[#F0EFE9] text-[#222222] placeholder-[#737373] border border-transparent focus:border-[#292929] focus:bg-white focus:outline-none transition-all"
               />
-            ))}
+            </div>
           </div>
 
-          {/* Right Search Input */}
-          <div className="relative min-w-[220px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#737D8B]" />
-            <input
-              type="text"
-              placeholder="Search staff or clinic..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-9 pr-4 text-xs rounded-full bg-[#EEF3F7] text-[#20242B] placeholder-[#737D8B] border border-transparent focus:border-[#9CCBFF] focus:bg-white focus:outline-none transition-colors"
-            />
-          </div>
-        </div>
-
-        {/* Main Ranking Table Card */}
-        <Card className="overflow-hidden border border-[#E3E9EF]">
+          {/* Table Container */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-separate border-spacing-y-2">
               <thead>
-                <tr className="border-b border-[#E3E9EF] bg-[#EEF3F7]/50 text-[11px] font-semibold text-[#737D8B] uppercase tracking-wider">
-                  <th className="py-3.5 px-4 w-12 text-center">Rank</th>
-                  <th className="py-3.5 px-4">Staff Dispenser</th>
-                  <th className="py-3.5 px-4">Practice Site</th>
-                  <th className="py-3.5 px-4">Curriculum Tier</th>
-                  <th className="py-3.5 px-4 text-center">Simulations</th>
-                  <th className="py-3.5 px-4 text-center">Quizzes</th>
-                  <th className="py-3.5 px-4 w-44">Mastery Progress</th>
-                  <th className="py-3.5 px-4 text-right">Points Earned</th>
+                <tr className="text-[11px] font-semibold text-[#737373] uppercase tracking-wider">
+                  <th className="py-2.5 px-3 w-10 text-center"></th>
+                  <th className="py-2.5 px-4 font-medium">Staff Member</th>
+                  <th className="py-2.5 px-4 font-medium">Clinical Role</th>
+                  <th className="py-2.5 px-4 font-medium">Practice Site</th>
+                  <th className="py-2.5 px-4 font-medium text-center">Simulations</th>
+                  <th className="py-2.5 px-4 font-medium text-center">Quizzes</th>
+                  <th className="py-2.5 px-4 font-medium text-right">Points Earned</th>
+                  <th className="py-2.5 px-4 font-medium text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E3E9EF]/60 text-sm">
+              <tbody className="text-sm">
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      <td colSpan={8} className="py-4 px-4">
-                        <div className="h-6 bg-[#EEF3F7] rounded-full w-full" />
+                      <td colSpan={8} className="py-4 px-4 bg-[#F0EFE9]/40 rounded-2xl">
+                        <div className="h-6 bg-[#E6E4DD]/60 rounded-full w-full" />
                       </td>
                     </tr>
                   ))
                 ) : sortedLeaderboard.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-[#737D8B]">
-                      No staff dispensers found matching your filters.
+                    <td colSpan={8} className="py-16 text-center text-[#737373]">
+                      <div className="max-w-sm mx-auto space-y-2">
+                        <p className="font-semibold text-base text-[#222222]">No Staff Matching Filters</p>
+                        <p className="text-xs text-[#737373]">Try adjusting your search criteria or clinic branch filter.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -259,122 +318,106 @@ export default function LeaderboardPage() {
                       <tr
                         key={entry.userId}
                         onClick={() => setSelectedUserId(entry.userId)}
-                        className={`transition-colors cursor-pointer group ${
+                        className={`transition-all cursor-pointer group ${
                           isSelected
-                            ? "bg-[#FFD95E] text-[#20242B] font-medium"
-                            : isCurrentUser
-                            ? "bg-[#DCEEFF]/40 hover:bg-[#DCEEFF]/60"
-                            : "hover:bg-[#EEF3F7]/50"
+                            ? "bg-[#FFD95E] text-[#222222] shadow-xs font-medium"
+                            : "bg-white hover:bg-[#F0EFE9]/70 text-[#222222] border border-[#E6E4DD]"
                         }`}
                       >
-                        {/* Rank Badge */}
-                        <td className="py-3.5 px-4 text-center">
-                          <span
-                            className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${
-                              rank === 1
-                                ? isSelected ? "bg-[#20242B] text-[#FFD95E]" : "bg-[#FFD95E] text-[#20242B] shadow-xs"
-                                : rank === 2
-                                ? "bg-[#EEF3F7] text-[#20242B] border border-[#E3E9EF]"
-                                : rank === 3
-                                ? "bg-[#FFF0C2] text-[#7A5300]"
-                                : "text-[#737D8B]"
-                            }`}
-                          >
-                            {rank}
-                          </span>
+                        {/* Checkbox / Rank Column */}
+                        <td className="py-3.5 px-3 text-center rounded-l-2xl">
+                          <div className="flex items-center justify-center">
+                            <span
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                isSelected
+                                  ? "bg-[#292929] text-white"
+                                  : rank === 1
+                                  ? "bg-[#FFD95E] text-[#222222] font-extrabold"
+                                  : rank === 2
+                                  ? "bg-[#E6E4DD] text-[#222222]"
+                                  : rank === 3
+                                  ? "bg-[#FEF3C7] text-[#92400E]"
+                                  : "text-[#737373]"
+                              }`}
+                            >
+                              {rank}
+                            </span>
+                          </div>
                         </td>
 
-                        {/* Staff Name and Avatar */}
+                        {/* Staff Name & Profile Photo Avatar */}
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-3">
-                            <StaffAvatar name={entry.name} size="md" status={isCurrentUser ? "active" : undefined} />
+                            <StaffAvatar
+                              name={entry.name}
+                              size="md"
+                              status={isCurrentUser ? "active" : undefined}
+                              className={isSelected ? "ring-2 ring-[#292929]" : ""}
+                            />
                             <div>
                               <div className="flex items-center gap-1.5">
-                                <span className={`font-semibold ${isSelected ? "text-[#20242B]" : "text-[#20242B]"}`}>
+                                <span className={`font-semibold ${isSelected ? "text-[#222222]" : "text-[#222222]"}`}>
                                   {entry.name}
                                 </span>
                                 {isCurrentUser && (
-                                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold uppercase ${
-                                    isSelected ? "bg-[#20242B] text-white" : "bg-[#242629] text-white"
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                                    isSelected ? "bg-[#292929] text-white" : "bg-[#292929] text-white"
                                   }`}>
                                     You
                                   </span>
                                 )}
                               </div>
-                              <span className={`text-xs block ${isSelected ? "text-[#20242B]/80" : "text-[#737D8B]"}`}>
+                              <span className={`text-xs block ${isSelected ? "text-[#222222]/80" : "text-[#737373]"}`}>
                                 {entry.email}
                               </span>
                             </div>
                           </div>
                         </td>
 
-                        {/* Practice Site */}
+                        {/* Clinical Role */}
                         <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-1.5">
-                            <Building2 className={`h-3.5 w-3.5 ${isSelected ? "text-[#20242B]" : "text-[#737D8B]"}`} />
-                            <span className="text-xs font-medium">
-                              {entry.clinicId || "Apex Optical Lab"}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Curriculum Tier */}
-                        <td className="py-3.5 px-4">
-                          <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              isSelected
-                                ? "bg-white/60 text-[#20242B] border border-[#20242B]/10"
-                                : "bg-[#EEF3F7] text-[#20242B] border border-[#E3E9EF]"
-                            }`}
-                          >
-                            <Award className="h-3 w-3 text-[#20242B]" />
-                            {entry.tier.tierName}
+                          <span className={`text-xs font-medium ${isSelected ? "text-[#222222]" : "text-[#737373]"}`}>
+                            {entry.tier?.tierName || "Dispensing Optician"}
                           </span>
                         </td>
 
-                        {/* Simulations Completed */}
-                        <td className="py-3.5 px-4 text-center font-mono font-medium">
+                        {/* Practice Site */}
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-1.5">
+                            <Building2 className={`h-3.5 w-3.5 ${isSelected ? "text-[#222222]" : "text-[#737373]"}`} />
+                            <span className="text-xs font-medium">
+                              {entry.clinicId || "Apex Optical"}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Simulations */}
+                        <td className="py-3.5 px-4 text-center font-mono font-medium text-xs">
                           {entry.simulationsCompleted}
                         </td>
 
-                        {/* Quizzes Passed */}
-                        <td className="py-3.5 px-4 text-center font-mono font-medium">
+                        {/* Quizzes */}
+                        <td className="py-3.5 px-4 text-center font-mono font-medium text-xs">
                           {entry.quizzesPassed}
                         </td>
 
-                        {/* Mastery Progress Bar */}
-                        <td className="py-3.5 px-4">
-                          <div className="w-full">
-                            <div className="flex justify-between text-[11px] mb-1 font-mono">
-                              <span className={isSelected ? "text-[#20242B]" : "text-[#737D8B]"}>
-                                Tier Level {entry.tier.level}
-                              </span>
-                              <span className="font-bold">{entry.tier.progressPercent}%</span>
-                            </div>
-                            <div className={`w-full h-2 rounded-full overflow-hidden ${isSelected ? "bg-black/15" : "bg-[#EEF3F7]"}`}>
-                              <div
-                                className={`h-full rounded-full transition-all duration-300 ${
-                                  isSelected ? "bg-[#20242B]" : "bg-[#FFD95E]"
-                                }`}
-                                style={{ width: `${entry.tier.progressPercent}%` }}
-                              />
-                            </div>
-                          </div>
+                        {/* Points Earned */}
+                        <td className="py-3.5 px-4 text-right font-mono font-bold text-sm">
+                          {entry.totalPoints.toLocaleString()} <span className="text-xs font-normal opacity-80">pts</span>
                         </td>
 
-                        {/* Points */}
-                        <td className="py-3.5 px-4 text-right">
-                          <div className="font-bold text-base tracking-tight font-mono">
-                            {period === "week"
-                              ? (entry.recentPoints || 0).toLocaleString()
-                              : entry.totalPoints.toLocaleString()}
-                            <span className="text-xs font-normal text-muted-foreground ml-1">pts</span>
-                          </div>
-                          {period === "week" && (
-                            <span className={`text-[10px] font-medium block ${isSelected ? "text-[#20242B]/80" : "text-[#8CE071]"}`}>
-                              +{entry.recentPoints || 0} this week
-                            </span>
-                          )}
+                        {/* Status Pill (Reference 1: Soft green pill with dot "Invited" / "Active") */}
+                        <td className="py-3.5 px-4 text-center rounded-r-2xl">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                              isSelected
+                                ? "bg-white text-[#222222] shadow-xs"
+                                : "bg-[#EAF5D5] text-[#255217]"
+                            }`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#255217]" />
+                            <span>Active</span>
+                          </span>
                         </td>
                       </tr>
                     );
@@ -383,49 +426,7 @@ export default function LeaderboardPage() {
               </tbody>
             </table>
           </div>
-        </Card>
-
-        {/* Selected Staff Performer Detail Spotlight (Bottom Drawer/Card) */}
-        {selectedUser && (
-          <div className="bg-white border border-[#E3E9EF] rounded-[20px] p-6 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <StaffAvatar name={selectedUser.name} size="xl" status="active" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="text-lg font-bold text-[#20242B]">{selectedUser.name}</h4>
-                  <Badge variant="yellow" size="sm">
-                    {selectedUser.tier.tierName}
-                  </Badge>
-                </div>
-                <p className="text-xs text-[#737D8B] mt-0.5">
-                  Assigned Practice: <span className="font-semibold text-[#20242B]">{selectedUser.clinicId}</span> • Total Points: <span className="font-mono font-bold text-[#20242B]">{selectedUser.totalPoints} pts</span>
-                </p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-[#737D8B]">
-                  <span><strong>{selectedUser.simulationsCompleted}</strong> Coaching Scenarios</span>
-                  <span>•</span>
-                  <span><strong>{selectedUser.lessonsCompleted}</strong> Dispensing Modules</span>
-                  <span>•</span>
-                  <span><strong>{selectedUser.quizzesPassed}</strong> Knowledge Checks</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Link href="/opticoach">
-                <Button variant="outline" size="sm" pill>
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>Challenge in AI Coach</span>
-                </Button>
-              </Link>
-              <Link href="/staff">
-                <Button variant="dark" size="sm" pill>
-                  <span>View Full Profile</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </AppShell>
   );

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     ];
 
     if (!user) {
-      return NextResponse.json({ sessions: fallbackSessions, isGuest: true });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -106,16 +106,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    let user = await getCurrentUser();
+    const user = await getCurrentUser();
     if (!user) {
-      user = {
-        id: "usr-guest-user",
-        email: "guest@apexoptics.com",
-        name: "Staff Optician (Guest)",
-        role: "STAFF",
-        clinicId: "apex-optics-01",
-        status: "ACTIVE",
-      };
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();

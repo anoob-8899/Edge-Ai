@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { shouldFallbackToMock } from "@/lib/demo-mode";
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,6 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     let models: any[] = [];
+    let isDbSuccess = false;
     try {
       models = await prisma.sunglassModel.findMany({
         where,
@@ -76,37 +78,55 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+      isDbSuccess = true;
     } catch (dbErr) {
-      console.warn("PostgreSQL models query failed, filtering fallback dataset:", dbErr);
+      if (!shouldFallbackToMock()) {
+        console.error("Database connection failure in /api/catalogue/models:", dbErr);
+        return NextResponse.json(
+          { error: "Database service unavailable. Real optical catalogue cannot be retrieved.", code: "DATABASE_UNAVAILABLE" },
+          { status: 503 }
+        );
+      }
+      console.warn("[DEMO MODE] PostgreSQL models query failed, filtering fallback dataset:", dbErr);
       models = [];
     }
 
     if (!models || models.length === 0) {
-      // Filter fallback models
-      const { FALLBACK_MODELS } = await import("@/lib/mock-data");
-      models = FALLBACK_MODELS.filter((m) => {
-        if (brandSlug && m.brand.slug !== brandSlug) return false;
-        if (shape && !m.frameShape.toLowerCase().includes(shape.toLowerCase())) return false;
-        if (material && (!m.frameMaterial || !m.frameMaterial.toLowerCase().includes(material.toLowerCase()))) return false;
-        if (polarized === "true" && !m.isPolarized) return false;
-        if (polarized === "false" && m.isPolarized) return false;
-        if (search) {
-          const s = search.toLowerCase();
-          const match =
-            m.officialProductName.toLowerCase().includes(s) ||
-            m.modelCode.toLowerCase().includes(s) ||
-            m.frameShape.toLowerCase().includes(s) ||
-            m.brand.name.toLowerCase().includes(s) ||
-            (m.frameMaterial && m.frameMaterial.toLowerCase().includes(s));
-          if (!match) return false;
-        }
-        return true;
-      });
+      if (!isDbSuccess && !shouldFallbackToMock()) {
+        return NextResponse.json(
+          { error: "Database service unavailable.", code: "DATABASE_UNAVAILABLE" },
+          { status: 503 }
+        );
+      }
+
+      if (!isDbSuccess) {
+        // Filter fallback models only when DB was unreachable in demo mode
+        const { FALLBACK_MODELS } = await import("@/lib/mock-data");
+        models = FALLBACK_MODELS.filter((m) => {
+          if (brandSlug && m.brand.slug !== brandSlug) return false;
+          if (shape && !m.frameShape.toLowerCase().includes(shape.toLowerCase())) return false;
+          if (material && (!m.frameMaterial || !m.frameMaterial.toLowerCase().includes(material.toLowerCase()))) return false;
+          if (polarized === "true" && !m.isPolarized) return false;
+          if (polarized === "false" && m.isPolarized) return false;
+          if (search) {
+            const s = search.toLowerCase();
+            const match =
+              m.officialProductName.toLowerCase().includes(s) ||
+              m.modelCode.toLowerCase().includes(s) ||
+              m.frameShape.toLowerCase().includes(s) ||
+              m.brand.name.toLowerCase().includes(s) ||
+              (m.frameMaterial && m.frameMaterial.toLowerCase().includes(s));
+            if (!match) return false;
+          }
+          return true;
+        });
+      }
     }
 
     return NextResponse.json({
       models,
       totalCount: models.length,
+      isDemoData: !isDbSuccess,
       appliedFilters: {
         search: search || null,
         brand: brandSlug || null,
@@ -118,11 +138,18 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching catalogue models:", error);
+    if (!shouldFallbackToMock()) {
+      console.error("Error fetching catalogue models:", error);
+      return NextResponse.json(
+        { error: "Database service unavailable.", code: "DATABASE_UNAVAILABLE" },
+        { status: 503 }
+      );
+    }
     const { FALLBACK_MODELS } = await import("@/lib/mock-data");
     return NextResponse.json({
       models: FALLBACK_MODELS,
       totalCount: FALLBACK_MODELS.length,
+      isDemoData: true,
       appliedFilters: {},
     });
   }
