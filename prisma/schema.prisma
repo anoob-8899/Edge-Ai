@@ -1,0 +1,405 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  staff
+  owner
+  admin
+  STAFF
+  OWNER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INVITED
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  passwordHash        String
+  name                String
+  role                Role                 @default(staff)
+  status              UserStatus           @default(ACTIVE)
+  clinicId            String?              @default("apex-optics-01")
+  totalPoints         Int                  @default(0)
+  lastLoginAt         DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  progress            UserLessonProgress[]
+  quizAttempts        QuizAttempt[]
+  optiCoachSessions   OptiCoachSession[]
+  privateRecords      StaffPrivateRecord[]
+  auditLogs           AuditLog[]
+  sessions            Session[]
+  assignmentsReceived Assignment[]         @relation("AssignedTo")
+  assignmentsCreated  Assignment[]         @relation("AssignedBy")
+  pointLedger         PointLedger[]
+  createdChallenges   WeeklyChallenge[]    @relation("CreatedChallenges")
+  challengeProgress   ChallengeProgress[]
+
+  @@index([email])
+  @@index([role])
+  @@index([totalPoints])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionToken])
+  @@index([userId])
+}
+
+model StaffPrivateRecord {
+  id                            String   @id @default(cuid())
+  userId                        String
+  title                         String
+  notes                         String   @db.Text
+  confidentialSalaryOrBonusTier String?
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+  user                          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  name          String
+  description   String
+  icon          String        @default("Glasses")
+  orderIndex    Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id          String   @id @default(cuid())
+  slug        String
+  name        String
+  description String
+  orderIndex  Int      @default(0)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lessons     Lesson[]
+
+  @@unique([categoryId, slug])
+}
+
+model Lesson {
+  id                    String               @id @default(cuid())
+  slug                  String
+  title                 String
+  summary               String
+  definitions           String               @db.Text
+  characteristics       String               @db.Text
+  practicalApplications String               @db.Text
+  misconceptions        String               @db.Text
+  limitations           String               @db.Text
+  brandModelReferences  String?              @db.Text
+  orderIndex            Int                  @default(0)
+  isPublished           Boolean              @default(true)
+  subcategoryId         String
+  subcategory           Subcategory          @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  quizQuestions         QuizQuestion[]
+  userProgress          UserLessonProgress[]
+  quizAttempts          QuizAttempt[]
+  assignments           Assignment[]
+
+  @@unique([subcategoryId, slug])
+}
+
+model QuizQuestion {
+  id                 String   @id @default(cuid())
+  lessonId           String
+  lesson             Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  question           String   @db.Text
+  options            String   @db.Text
+  correctOptionIndex Int
+  explanation        String   @db.Text
+  orderIndex         Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model UserLessonProgress {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId       String
+  lesson         Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  isCompleted    Boolean   @default(false)
+  completedAt    DateTime?
+  lastAccessedAt DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+model QuizAttempt {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId       String
+  lesson         Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  score          Int
+  totalQuestions Int
+  passed         Boolean
+  answers        String   @db.Text
+  createdAt      DateTime @default(now())
+}
+
+enum VerificationStatus {
+  VERIFIED
+  PARTIALLY_VERIFIED
+  UNVERIFIED
+}
+
+enum ApprovalStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model Brand {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String          @unique
+  parentCompany   String?
+  countryOfOrigin String?
+  heritage        String?         @db.Text
+  logoUrl         String?
+  websiteUrl      String?
+  orderIndex      Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  models          SunglassModel[]
+}
+
+model SunglassModel {
+  id                     String             @id @default(cuid())
+  brandId                String
+  brand                  Brand              @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  officialProductName    String
+  modelCode              String
+  subName                String?
+  slug                   String             @unique
+  category               String             @default("Sunglasses")
+  gender                 String?
+  frameShape             String
+  frameShapeVerified     Boolean            @default(true)
+  frameMaterial          String?
+  frameMaterialVerified  Boolean            @default(false)
+  frameFinish            String?
+  frameFinishVerified    Boolean            @default(false)
+  lensColor              String?
+  lensColorVerified      Boolean            @default(false)
+  lensMaterial           String?
+  lensMaterialVerified   Boolean            @default(false)
+  uvProtection           String?
+  uvProtectionVerified   Boolean            @default(false)
+  isPolarized            Boolean?
+  polarizationVerified   Boolean            @default(false)
+  lensTechnology         String?
+  lensTechnologyVerified Boolean            @default(false)
+  lensWidthMm            Float?
+  bridgeWidthMm          Float?
+  templeLengthMm         Float?
+  lensHeightMm           Float?
+  dimensionsVerified     Boolean            @default(false)
+  variants               String?            @db.Text
+  imageUrl               String?
+  sourceUrl              String
+  sourceName             String             @default("Edge Opticals Reference")
+  verificationStatus     VerificationStatus @default(UNVERIFIED)
+  lastVerifiedAt         DateTime?
+  verifiedBy             String?
+  verificationNotes      String?            @db.Text
+  approvalStatus         ApprovalStatus     @default(PENDING_REVIEW)
+  approvedBy             String?
+  approvedAt             DateTime?
+  reviewNotes            String?            @db.Text
+  opticalLearningNotes   String?            @db.Text
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([brandId])
+  @@index([modelCode])
+  @@index([verificationStatus])
+  @@index([approvalStatus])
+}
+
+enum OptiCoachSessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+model OptiCoachSession {
+  id                 String                 @id @default(cuid())
+  userId             String
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenarioId         String
+  scenarioTitle      String
+  scenarioCategory   String
+  status             OptiCoachSessionStatus @default(ACTIVE)
+  skillsPracticed    String?                @db.Text
+  feedbackSummary    String?                @db.Text
+  score              Int?
+  durationSeconds    Int                    @default(0)
+  contextualProducts String?                @db.Text
+  assessmentDetails  String?                @db.Text
+  startedAt          DateTime               @default(now())
+  completedAt        DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  messages           OptiCoachMessage[]
+
+  @@index([userId])
+  @@index([scenarioId])
+  @@index([status])
+}
+
+model OptiCoachMessage {
+  id        String           @id @default(cuid())
+  sessionId String
+  session   OptiCoachSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String
+  content   String           @db.Text
+  metadata  String?          @db.Text
+  createdAt DateTime         @default(now())
+
+  @@index([sessionId])
+}
+
+enum AssignmentActivityType {
+  LESSON
+  QUIZ
+  OPTICOACH_SCENARIO
+}
+
+enum AssignmentStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+model Assignment {
+  id            String                 @id @default(cuid())
+  assignedById  String
+  assignedBy    User                   @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+  assignedToId  String
+  assignedTo    User                   @relation("AssignedTo", fields: [assignedToId], references: [id], onDelete: Cascade)
+  targetGroup   String?
+  activityType  AssignmentActivityType @default(LESSON)
+  lessonId      String?
+  lesson        Lesson?                @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  scenarioId    String?
+  scenarioTitle String?
+  title         String
+  notes         String?                @db.Text
+  dueDate       DateTime?
+  status        AssignmentStatus       @default(PENDING)
+  completedAt   DateTime?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@index([assignedToId])
+  @@index([assignedById])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model PointLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points       Int
+  activityType String   // "LESSON_COMPLETION" | "QUIZ_PASSED" | "OPTICOACH_COMPLETED" | "ASSIGNMENT_COMPLETED" | "CHALLENGE_COMPLETED"
+  referenceId  String   // e.g. lessonId, attemptId, sessionId, assignmentId, challengeId
+  description  String
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, activityType, referenceId])
+  @@index([userId])
+  @@index([activityType])
+  @@index([createdAt])
+}
+
+model WeeklyChallenge {
+  id           String              @id @default(cuid())
+  creatorId    String
+  creator      User                @relation("CreatedChallenges", fields: [creatorId], references: [id], onDelete: Cascade)
+  title        String
+  description  String              @db.Text
+  startDate    DateTime            @default(now())
+  endDate      DateTime
+  pointsReward Int                 @default(200)
+  isActive     Boolean             @default(true)
+  requirements Json                // e.g. { requiredLessons: 2, requiredQuizzes: 1, requiredSimulations: 1, minScore: 70 }
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  progress     ChallengeProgress[]
+
+  @@index([creatorId])
+  @@index([isActive])
+  @@index([endDate])
+}
+
+model ChallengeProgress {
+  id              String          @id @default(cuid())
+  challengeId     String
+  challenge       WeeklyChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          String          @default("IN_PROGRESS") // "IN_PROGRESS" | "COMPLETED" | "EXPIRED"
+  currentProgress Json            // e.g. { lessonsCompleted: 1, quizzesPassed: 1, simulationsCompleted: 1 }
+  isCompleted     Boolean         @default(false)
+  completedAt     DateTime?
+  pointsAwarded   Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([challengeId, userId])
+  @@index([challengeId])
+  @@index([userId])
+  @@index([isCompleted])
+}

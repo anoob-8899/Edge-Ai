@@ -1,27 +1,53 @@
 {
-  "name": "temp-app",
+  "name": "edge-ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "seed:owner": "tsx tests/seed_owner.ts",
+    "test:auth": "tsx tests/test_auth_rbac.ts",
+    "test:catalogue": "tsx tests/test_catalogue.ts",
+    "test:library": "tsx tests/test_library.ts",
+    "test:opticoach": "tsx tests/test_opticoach.ts",
+    "test:assessment": "tsx tests/test_assessment_workflow.ts",
+    "test:owner": "tsx tests/test_owner_dashboard.ts",
+    "test:points": "tsx tests/test_points_and_challenges.ts",
+    "test:e2e": "tsx tests/test_e2e_browser.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.32.0",
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "jose": "^6.2.14",
+    "lucide-react": "^1.66.0",
+    "next": "15.5.28",
+    "pg": "^8.23.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.28"
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
+    "embedded-postgres": "^18.6.0-beta.19",
     "eslint": "^9",
     "eslint-config-next": "15.5.28",
-    "@eslint/eslintrc": "^3"
+    "playwright": "^1.64.1",
+    "prisma": "^7.10.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
   }
 }
