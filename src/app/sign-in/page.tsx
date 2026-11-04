@@ -37,6 +37,32 @@ export default function SignInPage() {
   const [bootstrapError, setBootstrapError] = React.useState<string | null>(null);
   const [bootstrapSuccess, setBootstrapSuccess] = React.useState<string | null>(null);
 
+  const handleQuickLogin = async (role: "staff" | "owner" | "ksenia") => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          role === "owner"
+            ? { demoRole: "owner" }
+            : role === "ksenia"
+            ? { email: "ksenia@apexoptics.com", password: "Password123!" }
+            : { demoRole: "staff" }
+        ),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Authentication failed");
+      }
+      window.location.href = role === "owner" ? "/owner" : "/staff";
+    } catch (err: any) {
+      setErrorMessage(err.message || "Failed to log in");
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -176,14 +202,14 @@ export default function SignInPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-[#20242B] mb-1">
-                  Staff Email Address
+                  Staff Email or Username
                 </label>
                 <Input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@optical-practice.com"
+                  placeholder="abhi, staff@apexoptics.com, or owner@apexoptics.com"
                   icon={<Mail className="h-4 w-4" />}
                 />
               </div>
@@ -224,6 +250,40 @@ export default function SignInPage() {
                   <span>{isLoading ? "Verifying Credentials..." : "Sign In to Platform"}</span>
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
+              </div>
+
+              {/* Instant One-Click Demo Access */}
+              <div className="pt-4 border-t border-[#E3E9EF]">
+                <p className="text-[11px] font-semibold text-[#737D8B] text-center mb-2 uppercase tracking-wider">
+                  Instant Test & Demo Accounts
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("staff")}
+                    disabled={isLoading}
+                    className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#EEF3F7] hover:bg-[#DCEEFF] text-left transition-colors border border-[#E3E9EF]"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-[#20242B] truncate">Alex Chen (Abhi)</div>
+                      <div className="text-[10px] text-[#737D8B]">Staff Dispenser</div>
+                    </div>
+                    <UserCheck className="h-4 w-4 text-[#20242B] shrink-0 ml-1" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("owner")}
+                    disabled={isLoading}
+                    className="flex items-center justify-between p-2.5 rounded-[14px] bg-[#242629] hover:bg-[#33383F] text-left transition-colors shadow-xs"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white truncate">Dr. Marcus Vance</div>
+                      <div className="text-[10px] text-[#FFD95E]">Practice Owner</div>
+                    </div>
+                    <ShieldCheck className="h-4 w-4 text-[#FFD95E] shrink-0 ml-1" />
+                  </button>
+                </div>
               </div>
             </form>
           </div>

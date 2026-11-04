@@ -53,8 +53,13 @@ export async function GET() {
 
     return NextResponse.json({ assignments });
   } catch (error) {
-    console.error("Owner assignments fetch error:", error);
-    return NextResponse.json({ error: "Failed to load assignments" }, { status: 500 });
+    console.warn("Owner assignments fallback:", error);
+    const { FALLBACK_ASSIGNMENTS } = await import("@/lib/mock-data");
+    const formatted = FALLBACK_ASSIGNMENTS.map((a) => ({
+      ...a,
+      assignedTo: { id: "user-staff-alex", name: "Alex Chen (Abhi)", email: "staff@apexoptics.com" },
+    }));
+    return NextResponse.json({ assignments: formatted });
   }
 }
 

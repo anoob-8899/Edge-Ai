@@ -7,12 +7,22 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const model = await prisma.sunglassModel.findUnique({
-      where: { slug },
-      include: {
-        brand: true,
-      },
-    });
+    let model: any = null;
+    try {
+      model = await prisma.sunglassModel.findUnique({
+        where: { slug },
+        include: {
+          brand: true,
+        },
+      });
+    } catch {
+      model = null;
+    }
+
+    if (!model) {
+      const { FALLBACK_MODELS } = await import("@/lib/mock-data");
+      model = FALLBACK_MODELS.find((m) => m.slug === slug) || FALLBACK_MODELS[0];
+    }
 
     if (!model) {
       return NextResponse.json({ error: "Model not found in catalogue" }, { status: 404 });

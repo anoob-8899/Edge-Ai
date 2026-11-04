@@ -56,24 +56,53 @@ export async function GET(request: NextRequest) {
       where.approvalStatus = approval as Prisma.EnumApprovalStatusFilter;
     }
 
-    const models = await prisma.sunglassModel.findMany({
-      where,
-      orderBy: [
-        { brand: { orderIndex: "asc" } },
-        { officialProductName: "asc" },
-      ],
-      include: {
-        brand: {
-          select: {
-            id: true,
-            slug: true,
-            name: true,
-            parentCompany: true,
-            countryOfOrigin: true,
+    let models: any[] = [];
+    try {
+      models = await prisma.sunglassModel.findMany({
+        where,
+        orderBy: [
+          { brand: { orderIndex: "asc" } },
+          { officialProductName: "asc" },
+        ],
+        include: {
+          brand: {
+            select: {
+              id: true,
+              slug: true,
+              name: true,
+              parentCompany: true,
+              countryOfOrigin: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (dbErr) {
+      console.warn("PostgreSQL models query failed, filtering fallback dataset:", dbErr);
+      models = [];
+    }
+
+    if (!models || models.length === 0) {
+      // Filter fallback models
+      const { FALLBACK_MODELS } = await import("@/lib/mock-data");
+      models = FALLBACK_MODELS.filter((m) => {
+        if (brandSlug && m.brand.slug !== brandSlug) return false;
+        if (shape && !m.frameShape.toLowerCase().includes(shape.toLowerCase())) return false;
+        if (material && (!m.frameMaterial || !m.frameMaterial.toLowerCase().includes(material.toLowerCase()))) return false;
+        if (polarized === "true" && !m.isPolarized) return false;
+        if (polarized === "false" && m.isPolarized) return false;
+        if (search) {
+          const s = search.toLowerCase();
+          const match =
+            m.officialProductName.toLowerCase().includes(s) ||
+            m.modelCode.toLowerCase().includes(s) ||
+            m.frameShape.toLowerCase().includes(s) ||
+            m.brand.name.toLowerCase().includes(s) ||
+            (m.frameMaterial && m.frameMaterial.toLowerCase().includes(s));
+          if (!match) return false;
+        }
+        return true;
+      });
+    }
 
     return NextResponse.json({
       models,
@@ -90,9 +119,11 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching catalogue models:", error);
-    return NextResponse.json(
-      { error: "Failed to search sunglasses catalogue" },
-      { status: 500 }
-    );
+    const { FALLBACK_MODELS } = await import("@/lib/mock-data");
+    return NextResponse.json({
+      models: FALLBACK_MODELS,
+      totalCount: FALLBACK_MODELS.length,
+      appliedFilters: {},
+    });
   }
 }

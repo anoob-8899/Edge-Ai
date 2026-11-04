@@ -274,8 +274,13 @@ export function StaffChallengesCard({ currentUserId }: { currentUserId?: string 
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {challenges.map((ch) => {
-                  const prog = ch.userProgress.progressDetails;
-                  const isDone = ch.userProgress.isCompleted;
+                  const prog = ch.userProgress?.progressDetails || {
+                    percentComplete: 0,
+                    lessonsCompleted: 0,
+                    quizzesPassed: 0,
+                    simulationsCompleted: 0,
+                  };
+                  const isDone = ch.userProgress?.isCompleted || false;
                   const isExpired = ch.isPastDeadline && !isDone;
 
                   return (
@@ -317,7 +322,7 @@ export function StaffChallengesCard({ currentUserId }: { currentUserId?: string 
                       <div className="mt-3 flex items-center gap-1.5 text-xs text-[#8796AA] font-mono">
                         <Calendar className="h-3.5 w-3.5 text-[#4285F4]" />
                         <span>Deadline: {new Date(ch.endDate).toLocaleDateString()}</span>
-                        {isDone && ch.userProgress.completedAt && (
+                        {isDone && ch.userProgress?.completedAt && (
                           <span className="text-[#16865C] ml-auto font-semibold">
                             ✓ Achieved {new Date(ch.userProgress.completedAt).toLocaleDateString()}
                           </span>
@@ -345,7 +350,7 @@ export function StaffChallengesCard({ currentUserId }: { currentUserId?: string 
 
                         {/* Requirement Badges */}
                         <div className="grid grid-cols-3 gap-1.5 pt-1 text-center">
-                          {ch.requirements.requiredLessons !== undefined && ch.requirements.requiredLessons > 0 && (
+                          {ch.requirements?.requiredLessons !== undefined && ch.requirements.requiredLessons > 0 && (
                             <div className="p-1.5 rounded-lg bg-[#F0F7FF] border border-[#DCE8F5] text-[10px]">
                               <div className="text-[#8796AA]">Lessons</div>
                               <div className="font-bold text-[#172B4D] font-mono">
@@ -354,7 +359,7 @@ export function StaffChallengesCard({ currentUserId }: { currentUserId?: string 
                             </div>
                           )}
 
-                          {ch.requirements.requiredQuizzes !== undefined && ch.requirements.requiredQuizzes > 0 && (
+                          {ch.requirements?.requiredQuizzes !== undefined && ch.requirements.requiredQuizzes > 0 && (
                             <div className="p-1.5 rounded-lg bg-[#F0F7FF] border border-[#DCE8F5] text-[10px]">
                               <div className="text-[#8796AA]">Quizzes</div>
                               <div className="font-bold text-[#172B4D] font-mono">
@@ -363,7 +368,7 @@ export function StaffChallengesCard({ currentUserId }: { currentUserId?: string 
                             </div>
                           )}
 
-                          {ch.requirements.requiredSimulations !== undefined && ch.requirements.requiredSimulations > 0 && (
+                          {ch.requirements?.requiredSimulations !== undefined && ch.requirements.requiredSimulations > 0 && (
                             <div className="p-1.5 rounded-lg bg-[#F0F7FF] border border-[#DCE8F5] text-[10px]">
                               <div className="text-[#8796AA]">AI Coaching</div>
                               <div className="font-bold text-[#172B4D] font-mono">

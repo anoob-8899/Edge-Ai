@@ -266,10 +266,10 @@ export default function LearningLibraryPage() {
                 12 Starting Brands • Verified Specs
               </span>
             </div>
-            <h2 className="text-xl font-bold text-white tracking-tight">
+            <h2 className="text-xl font-bold !text-white tracking-tight">
               Branded Sunglasses & Optical Frames Catalogue
             </h2>
-            <p className="text-xs md:text-sm text-gray-300 leading-relaxed">
+            <p className="text-xs md:text-sm !text-gray-200 leading-relaxed">
               Explore Ray-Ban, Gucci, Prada, Oakley, Tom Ford, Carrera, Police, and Vogue with verified frame shapes, lens technologies, and clinical dispensing notes.
             </p>
           </div>
@@ -383,8 +383,8 @@ export default function LearningLibraryPage() {
             {categories.map((cat) => {
               const IconComp = iconMap[cat.icon] || Glasses;
               const isSelected = selectedCategory === cat.id;
-              const totalLessons = cat.subcategories.reduce(
-                (sum, s) => sum + s._count.lessons,
+              const totalLessons = (cat.subcategories || []).reduce(
+                (sum, s: any) => sum + (s._count?.lessons ?? (s.lessons ? s.lessons.length : 1)),
                 0
               );
 

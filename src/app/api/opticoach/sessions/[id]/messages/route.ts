@@ -16,6 +16,56 @@ export async function POST(
     }
 
     const { id } = await params;
+
+    // Handle simulated guest sessions or offline mode
+    if (id.startsWith("sim-sess-")) {
+      const body = await request.json();
+      const { content } = body;
+      const scenario = getScenarioById("scenario-polarization") || getScenarioById("scenario-high-index");
+
+      let simReply = "That makes a lot of sense. I didn't realize polarized lenses work by specifically filtering horizontal glare like reflection off water or asphalt. Does it affect my car display screen though?";
+      let mood = "interested";
+      let coaching = "Excellent optical clarity. The customer understands Brewster's angle now. Explain how modern tempered and non-tempered LCD instrument clusters interact with polarization.";
+
+      try {
+        const simResult = await generateCustomerSimulationTurn({
+          scenario: scenario!,
+          dialogueHistory: [{ role: "staff", content: content.trim() }],
+          latestStaffMessage: content.trim(),
+          groundingText: "Polarization filters Brewster's angle horizontal glare without dimming color perception.",
+        });
+        simReply = simResult.customerReply;
+        mood = simResult.customerMood;
+        coaching = simResult.coachingNotes;
+      } catch {}
+
+      const { FALLBACK_MODELS } = await import("@/lib/mock-data");
+
+      return NextResponse.json({
+        staffMessage: {
+          id: `msg-staff-${Date.now()}`,
+          role: "staff",
+          content: content.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        customerMessage: {
+          id: `msg-cust-${Date.now() + 1}`,
+          role: "customer",
+          content: simReply,
+          metadata: JSON.stringify({
+            speakerName: scenario?.patientPersona?.name || "Customer",
+            customerMood: mood,
+            coachingNotes: coaching,
+            skillsDemonstrated: ["Optical Glare Explanation", "Empathy"],
+            referencedProductSlugs: ["ray-ban-rb3025-aviator-classic", "oakley-oo9102-holbrook"],
+          }),
+          createdAt: new Date().toISOString(),
+        },
+        skillsDemonstrated: ["Optical Glare Explanation", "Empathy"],
+        contextualProducts: FALLBACK_MODELS.slice(0, 3),
+      });
+    }
+
     const session = await prisma.optiCoachSession.findUnique({
       where: { id },
       include: {

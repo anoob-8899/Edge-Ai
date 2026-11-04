@@ -18,6 +18,37 @@ export async function POST(
     }
 
     const { id } = await params;
+
+    if (id.startsWith("sim-sess-")) {
+      const simulatedAssessment = {
+        sessionId: id,
+        scenarioId: "scenario-polarization",
+        scenarioTitle: "Recommending Polarized Lenses for Daytime Driving",
+        overallScore: 91,
+        competencyScores: [
+          { name: "Optical Knowledge & Glare Mechanics", score: 95, feedback: "Clearly explained horizontal glare vs vertical transmission." },
+          { name: "Patient Empathy & Active Listening", score: 90, feedback: "Understood daytime driving fatigue and reflections off dashboard." },
+          { name: "Objection Handling & Value Articulation", score: 88, feedback: "Overcame pricing questions by focusing on visual comfort." },
+          { name: "Professional Communication", score: 92, feedback: "Professional tone, crisp medical explanations." },
+        ],
+        strengths: ["Strong clinical understanding of Brewster's angle", "Confident recommendation of Ray-Ban and Oakley polarized models"],
+        growthAreas: ["Proactively mention HUD windshield display interactions early in consultation"],
+        recommendedFollowUpAction: "Review Lens Coatings module lesson on Anti-Reflective coatings.",
+      };
+
+      return NextResponse.json({
+        assessment: simulatedAssessment,
+        pointsAwarded: 50,
+        totalPoints: 1700,
+        session: {
+          id,
+          status: "COMPLETED",
+          score: 91,
+          feedbackSummary: "Great performance in patient glare discovery.",
+        },
+      });
+    }
+
     const session = await prisma.optiCoachSession.findUnique({
       where: { id },
       include: {

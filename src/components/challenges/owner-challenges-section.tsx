@@ -287,19 +287,19 @@ export function OwnerChallengesSection() {
                     <div className="flex items-center gap-2 pt-1">
                       <span className="text-[11px] font-semibold text-[#8796AA]">Criteria:</span>
                       <div className="flex flex-wrap gap-1 text-[10px]">
-                        {ch.requirements.requiredLessons > 0 && (
+                        {(ch.requirements?.requiredLessons ?? 0) > 0 && (
                           <span className="px-1.5 py-0.5 rounded bg-white border border-[#DCE8F5] text-[#172B4D]">
-                            {ch.requirements.requiredLessons} Lessons
+                            {ch.requirements?.requiredLessons} Lessons
                           </span>
                         )}
-                        {ch.requirements.requiredQuizzes > 0 && (
+                        {(ch.requirements?.requiredQuizzes ?? 0) > 0 && (
                           <span className="px-1.5 py-0.5 rounded bg-white border border-[#DCE8F5] text-[#172B4D]">
-                            {ch.requirements.requiredQuizzes} Quizzes
+                            {ch.requirements?.requiredQuizzes} Quizzes
                           </span>
                         )}
-                        {ch.requirements.requiredSimulations > 0 && (
+                        {(ch.requirements?.requiredSimulations ?? 0) > 0 && (
                           <span className="px-1.5 py-0.5 rounded bg-white border border-[#DCE8F5] text-[#172B4D]">
-                            {ch.requirements.requiredSimulations} Simulations
+                            {ch.requirements?.requiredSimulations} Simulations
                           </span>
                         )}
                       </div>
@@ -613,13 +613,13 @@ export function OwnerChallengesSection() {
                           </Badge>
                         </td>
                         <td className="py-3 px-4 text-center font-mono">
-                          {staff.lessonsCompleted} / {selectedChallengeReport.challenge.requirements.requiredLessons || 0}
+                          {staff.lessonsCompleted} / {selectedChallengeReport.challenge.requirements?.requiredLessons || 0}
                         </td>
                         <td className="py-3 px-4 text-center font-mono">
-                          {staff.quizzesPassed} / {selectedChallengeReport.challenge.requirements.requiredQuizzes || 0}
+                          {staff.quizzesPassed} / {selectedChallengeReport.challenge.requirements?.requiredQuizzes || 0}
                         </td>
                         <td className="py-3 px-4 text-center font-mono">
-                          {staff.simulationsCompleted} / {selectedChallengeReport.challenge.requirements.requiredSimulations || 0}
+                          {staff.simulationsCompleted} / {selectedChallengeReport.challenge.requirements?.requiredSimulations || 0}
                         </td>
                         <td className="py-3 px-4 text-center text-[11px] text-[#8796AA] font-mono">
                           {staff.completedAt ? new Date(staff.completedAt).toLocaleDateString() : "-"}

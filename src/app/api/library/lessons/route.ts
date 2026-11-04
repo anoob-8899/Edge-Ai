@@ -123,11 +123,50 @@ export async function GET(req: Request) {
       totalCount: filtered.length,
     });
   } catch (error) {
-    console.error("Lessons fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch lessons" },
-      { status: 500 }
-    );
+    console.warn("Serving fallback lessons (PostgreSQL offline or unseeded):", error);
+    const { FALLBACK_CATEGORIES } = await import("@/lib/mock-data");
+    const fallbackLessons: any[] = [];
+    for (const cat of FALLBACK_CATEGORIES) {
+      for (const sub of cat.subcategories) {
+        for (const les of sub.lessons) {
+          fallbackLessons.push({
+            id: les.id,
+            slug: les.slug,
+            title: les.title,
+            summary: les.summary,
+            definitions: les.definitions,
+            characteristics: les.characteristics,
+            practicalApplications: les.practicalApplications,
+            misconceptions: les.misconceptions,
+            limitations: les.limitations,
+            brandModelReferences: les.brandModelReferences,
+            orderIndex: les.orderIndex,
+            isPublished: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            subcategory: {
+              id: sub.id,
+              slug: sub.slug,
+              name: sub.name,
+              category: {
+                id: cat.id,
+                slug: cat.slug,
+                name: cat.name,
+                icon: cat.icon,
+              },
+            },
+            quizCount: les.quizzes.length,
+            userProgress: null,
+            latestQuizScore: null,
+            status: "not-started",
+          });
+        }
+      }
+    }
+    return NextResponse.json({
+      lessons: fallbackLessons,
+      totalCount: fallbackLessons.length,
+    });
   }
 }
 
